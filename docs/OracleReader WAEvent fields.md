@@ -63,16 +63,16 @@ data: 一个域的数组, 从0计数, 包括:
 <table class="confluenceTable">
         <thead class=" ">    <tr>
             <td  class="confluenceTh" rowspan="1" colspan="1">
-        <p  >metadata property    </p>
+        <p  >元数据属性    </p>
             </td>
                 <td  class="confluenceTh" rowspan="1" colspan="1">
-        <p  >present<br/>when using<br/>LogMiner    </p>
+        <p  > 当使用LogMiner时    </p>
             </td>
                 <td  class="confluenceTh" rowspan="1" colspan="1">
-        <p  >present<br/>when using<br/>XStream Out    </p>
+        <p  > 当使用XStream Out时    </p>
             </td>
                 <td  class="confluenceTh" rowspan="1" colspan="1">
-        <p  >comments    </p>
+        <p  >说明    </p>
             </td>
         </tr>
 </thead><tfoot class=" "></tfoot><tbody class=" ">    <tr>
@@ -86,7 +86,7 @@ data: 一个域的数组, 从0计数, 包括:
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Audit session ID associated with the user session making the change    </p>
+        <p  >Audit session ID 与 User Session 相关联, 更新数据    </p>
             </td>
         </tr>
     <tr>
@@ -116,7 +116,7 @@ data: 一个域的数组, 从0计数, 包括:
                 <td  class="confluenceTd" rowspan="1" colspan="1">
         <p  >    <span style="color: #000000;">
       <span style="color: #222222;">
-System change number (SCN) when the transaction committed    </span>
+System change number (SCN), 当事务提交时的SCN值    </span>
       </span>
     </p>
             </td>
@@ -132,7 +132,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >x    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >User level SQL operation that made the change (INSERT, UPDATE, ...)    </p>
+        <p  >用户层 SQL 操作 (INSERT, UPDATE, ...) , 用于更新   </p>
             </td>
         </tr>
     <tr>
@@ -146,7 +146,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Raw representation of the parent transaction identifier    </p>
+        <p  >父事务标识符的裸代表    </p>
             </td>
         </tr>
     <tr>
@@ -160,7 +160,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >true if an UPDATE operation changed the primary key, otherwise false    </p>
+        <p  >true 如果一个 UPDATE 操作更改了主键, 否则为 false    </p>
             </td>
         </tr>
     <tr>
@@ -174,7 +174,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >RBA block number within the log file    </p>
+        <p  >在日志文件中的 RBA 块的号码    </p>
             </td>
         </tr>
     <tr>
@@ -188,7 +188,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Sequence# associated with the Redo Block Address (RBA) of the redo record associated with the change    </p>
+        <p  >Sequence# 与 redo record 的Redo Block Address (RBA) 相关联, 此 redo record与更新有关    </p>
             </td>
         </tr>
     <tr>
@@ -202,7 +202,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Uniquely identifies the redo record that generated the row. The tuple (RS_ID, SSN) together uniquely identifies a logical row change.    </p>
+        <p  >唯一标识 redo record , 生成此行. Tuple (RS_ID, SSN)  组合在一起唯一标识一个逻辑行的变更.    </p>
             </td>
         </tr>
     <tr>
@@ -216,7 +216,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >1 = if the redo record was generated because of a partial or a full rollback of the associated transaction, 0 = otherwise    </p>
+        <p  >1 = 如果 redo record 生成了, 由于相关的事务半回滚或完全回滚, 0 = 反之    </p>
             </td>
         </tr>
     <tr>
@@ -230,7 +230,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >x    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Row ID of the row modified by the change (only meaningful if the change pertains to a DML). This will be NULL if the redo record is not associated with a DML.    </p>
+        <p  >通过更新, 修改行的Row ID (如果更新仅针对一个DML操作, 有意义). 将要是NULL, 如果redo record并不与一个 DML相互关联.    </p>
             </td>
         </tr>
     <tr>
@@ -244,7 +244,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >x    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >System change number (SCN) when the database change was made    </p>
+        <p  >System change number (SCN) 当数据库已经更新时    </p>
             </td>
         </tr>
     <tr>
@@ -258,7 +258,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Name of the modified data segment    </p>
+        <p  >修改的数据分段的名称    </p>
             </td>
         </tr>
     <tr>
@@ -272,7 +272,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Type of the modified data segment (INDEX, TABLE, ...)    </p>
+        <p  >修改的数据分段的类型 (INDEX, TABLE, ...)    </p>
             </td>
         </tr>
     <tr>
@@ -286,7 +286,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Serial number of the session that made the change    </p>
+        <p  >做更新的 Session 的序列号   </p>
             </td>
         </tr>
     <tr>
@@ -300,7 +300,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Session number of the session that made the change    </p>
+        <p  >做更新的 Session 的序列号    </p>
             </td>
         </tr>
     <tr>
@@ -314,7 +314,9 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Information about the database session that executed the transaction. Contains process information, machine name from which the user logged in, client info, and so on.    </p>
+        <p  >
+        	数据库 Session 执行事务的信息.包含进程信息, 用户登录的机器名称, 客户端信息, 等等
+           </p>
             </td>
         </tr>
     <tr>
@@ -328,7 +330,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Length of reconstructed SQL statement that is equivalent to the original SQL statement that made the change.    </p>
+        <p  >重新构造的SQL语句长度, 等同于原有的SQL语句.    </p>
             </td>
         </tr>
     <tr>
@@ -342,7 +344,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >x    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Name of the modified table (in case the redo pertains to a table modification)    </p>
+        <p  >修改表的名称 (redo 从属于一个表的更新)    </p>
             </td>
         </tr>
     <tr>
@@ -356,7 +358,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Name of the tablespace containing the modified data segment.    </p>
+        <p  >表空间的名称,包含了已经修改的数据分段.    </p>
             </td>
         </tr>
     <tr>
@@ -370,7 +372,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >ID of the thread that made the change to the database    </p>
+        <p  >更新数据库的线程ID    </p>
             </td>
         </tr>
     <tr>
@@ -384,7 +386,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >x    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Timestamp when the database change was made    </p>
+        <p  >更新数据库的时间戳    </p>
             </td>
         </tr>
     <tr>
@@ -398,7 +400,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >x    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Name of the transaction that made the change; only meaningful if the transaction is a named transaction    </p>
+        <p  >进行更新的事务名称; 仅对事务是一个命名事务时有意义    </p>
             </td>
         </tr>
     <tr>
@@ -412,7 +414,7 @@ System change number (SCN) when the transaction committed    </span>
         <p  >x    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Raw representation of the transaction identifier    </p>
+        <p  >事务标识符的原生表示    </p>
             </td>
         </tr>
     <tr>
