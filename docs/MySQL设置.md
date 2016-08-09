@@ -34,7 +34,7 @@
 
 	<br />
 	   <pre><code>
-        2016-04-25 19:05:40,377 @ -WARN hz._hzInstance_1_striim351_0423.cached.thread-2 com.webaction.runtime.Server.startSources (Server.java:2477) Failure in Starting Sources.
+        2016-04-25 19:05:40,377 @ -WARN hz._hzInstance_1_stream351_0423.cached.thread-2 com.bloom.runtime.Server.startSources (Server.java:2477) Failure in Starting Sources.
 java.lang.Exception: Problem with the configuration of MySQL
 Row logging must be specified.
 Binary logging is not enabled.
@@ -42,7 +42,7 @@ The server ID must be specified.
 Add --binlog-format=ROW to the mysqld command line or add binlog-format=ROW to your my.cnf file
 Add --bin-log to the mysqld command line or add bin-log to your my.cnf file
 Add --server-id=n where n is a positive number to the mysqld command line or add server-id=n to your my.cnf file
-        at com.webaction.proc.MySQLReader_1_0.checkMySQLConfig(MySQLReader_1_0.java:605) ...
+        at com.bloom.proc.MySQLReader_1_0.checkMySQLConfig(MySQLReader_1_0.java:605) ...
        </code></pre>
 	<br />
 
