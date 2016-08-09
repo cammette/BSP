@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>What is change data capture? - Striim 3.6.1 documentation</title>
+
+    <meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+
+<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="assets/js/jquery.scrollTo.min.js"></script>
+
+
+<script type="text/javascript" src="assets/js/scroll-tree.js"></script>
+
+<script type="text/javascript" src="assets/js/theme.main.js"></script>
+
+
+<link rel="stylesheet" href="assets/css/content-style.css">
+    <link rel="stylesheet" href="assets/css/search.css">
+
+<link rel="stylesheet" href="assets/css/theme.main.css">
+<link rel="stylesheet" href="assets/css/theme.colors.css">
+
+            <!-- ES5 support for older browsers, needed by lunr -->
+        <script src="js/augment.js"></script>
+        <script id="worker" type="javascript/worker">
+
+        startIndex = function() {
+            idx = lunr.Index.load(lunrIndex);
+            idx.pipeline.remove(lunr.stopWordFilter);
+            postMessage({type: "setup-complete"});
+        }
+
+        onmessage = function (event) {
+            var message = event.data;
+
+            if ((message.type === 'setup') && message.baseUrl) {
+                var url = message.baseUrl;
+                importScripts(url + 'js/lunr.js');
+                importScripts(url + 'js/lunr-extras.js');
+                importScripts(url + 'js/lunr-index.js');
+                importScripts(url + 'js/lunr-data.js');
+                startIndex();
+            }
+
+            if (idx && (message.type === 'search-request') && message.query) {
+                var searchWord = message.query;
+                var results = idx.search(searchWord).map(function (result) {
+                    return lunrData.filter(function (d) {
+                        return d.id === parseInt(result.ref, 10)
+                    })[0]
+                });
+                postMessage({type: 'search-results', results: results, query: searchWord, queryId: message.queryId});
+            }
+        }
+
+    </script>
+    </head>
+
+<body pageid="524308">
+
+<div id="ht-loader"></div>
+
+<div>
+   	<header id="ht-headerbar">
+    <div class="ht-headerbar-left">
+        <a href="" id="ht-menu-toggle" class="sp-aui-icon-small sp-aui-iconfont-appswitcher"></a>
+    </div>
+    <div class="ht-headerbar-right">
+            <div class="sp-aui-icon-small ht-search-index-loader ht-header-icon"></div>
+
+        <div id="ht-search">
+            <div class="ht-search-input" style="display: none;">
+              	<a href="#" class="sp-aui-icon-small sp-aui-iconfont-remove ht-search-clear"></a>
+
+                <form action="#" method="GET" id="search">
+                    <input class="search-input" type="text" placeholder="Search" tabindex="-1" autocomplete="off" name="q" value="">
+                    <input type="hidden" name="max" value="15" />
+                    <input type="submit" style="display:none" tabindex="-4"/>
+                </form>
+
+                <a href="#" id="ht-search-button" class="ht-header-icon ht-header-icon-svg">
+                                        <svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <g>
+                            <path d="M29.572,28.802 L28.801,29.571 C28.515,29.857 28.187,30 27.816,30 C27.445,30 27.116,29.857 26.831,29.571 L21.392,24.134 C20.193,24.762 18.908,25.076 17.538,25.076 C15.396,25.076 13.605,24.348 12.163,22.892 C10.721,21.436 10,19.651 10,17.538 C10,15.397 10.721,13.605 12.163,12.163 C13.605,10.721 15.396,10 17.538,10 C19.651,10 21.434,10.721 22.89,12.163 C24.347,13.605 25.075,15.397 25.075,17.538 C25.075,18.937 24.761,20.222 24.132,21.393 L29.572,26.832 C29.857,27.118 30,27.446 30,27.817 C30,28.188 29.857,28.517 29.572,28.802 L29.572,28.802 Z M13.662,21.414 C14.732,22.485 16.024,23.02 17.538,23.02 C19.051,23.02 20.343,22.485 21.413,21.414 C22.484,20.344 23.019,19.052 23.019,17.538 C23.019,16.025 22.484,14.733 21.413,13.662 C20.343,12.592 19.051,12.056 17.538,12.056 C16.024,12.056 14.732,12.592 13.662,13.662 C12.591,14.733 12.056,16.025 12.056,17.538 C12.056,19.052 12.591,20.344 13.662,21.414 L13.662,21.414 Z"></path>
+                        </g>
+                    </svg>
+              	</a>
+
+                <div class="ht-search-dropdown ht-dropdown">
+                    <ul></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    </header>   	<aside id="ht-sidebar">
+    <div class="ht-sidebar-content">
+        <div class="ht-sidebar-content-scroll-container">
+            <header class="ht-sidebar-header">
+                <h1 class="ht-logo">
+                    <span class="ht-logo-label">draftdoc</span>
+                    <img class="space-logo" src="spacelogo.png" />
+                </h1>
+                <a href="Striim_documentation.html" class="ht-space-link">
+                    <h2>Striim 3.6.1 documentation</h2>
+                </a>
+            </header>
+
+            <nav class="ht-pages-nav">
+                <ul class="ht-pages-nav-top">
+                                                <li class="leaf">
+        <a class="ht-nav-page-link" href="Getting_started_with_Striim.html">Getting started with Striim</a>
+
+            </li>
+                                                <li class="leaf">
+        <a class="ht-nav-page-link" href="What_is_Striim_.html">What is Striim?</a>
+
+            </li>
+                                                <li class="collapsed">
+        <a class="ht-nav-page-link" href="Quick_Start.html">Quick Start</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Configuring_your_system_to_install_Striim.html">Configuring your system to install Striim</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_Striim_for_evaluation_purposes.html">Installing Striim for evaluation purposes</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Viewing_dashboards.html">Viewing dashboards</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Creating_sources_and_caches_using_Source_Preview.html">Creating sources and caches using Source Preview</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Modifying_an_application_using_the_Flow_Designer.html">Modifying an application using the Flow Designer</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Browsing_data_with_ad-hoc_queries.html">Browsing data with ad-hoc queries</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Creating_a_dashboard.html">Creating a dashboard</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Exporting_applications_and_dashboards.html">Exporting applications and dashboards</a>
+
+            </li>
+                            </ul>
+            </li>
+                                                <li class="leaf">
+        <a class="ht-nav-page-link" href="Introducing_Kafka_streams.html">Introducing Kafka streams</a>
+
+            </li>
+                                                <li class="leaf">
+        <a class="ht-nav-page-link" href="Typographical_and_syntax_conventions.html">Typographical and syntax conventions</a>
+
+            </li>
+                                                <li class="collapsed">
+        <a class="ht-nav-page-link" href="Web_UI_Guide.html">Web UI Guide</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Apps_page.html">Apps page</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Dashboards_page.html">Dashboards page</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Metadata_Manager_page.html">Metadata Manager page</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Monitor_page.html">Monitor page</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Source_Preview_page.html">Source Preview page</a>
+
+            </li>
+                            </ul>
+            </li>
+                                                <li class="collapsed">
+        <a class="ht-nav-page-link" href="Dashboard_Guide.html">Dashboard Guide</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Dashboard_rules_and_best_practices.html">Dashboard rules and best practices</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Adding_visualizations_to_a_dashboard.html">Adding visualizations to a dashboard</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Defining_dashboard_queries.html">Defining dashboard queries</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Visualization_types_and_properties.html">Visualization types and properties</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Properties_common_to_multiple_visualization_types.html">Properties common to multiple visualization types</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Bar_chart.html">Bar chart</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Choropleth_map.html">Choropleth map</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Gauge.html">Gauge</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Heat_map.html">Heat map</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Icon.html">Icon</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Leaflet_map.html">Leaflet map</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Line,_scatter,_and_bubble_charts.html">Line, scatter, and bubble charts</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Pie_and_donut_charts.html">Pie and donut charts</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Table_and_search.html">Table and search</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Value_(text_label).html">Value (text label)</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Vector_map.html">Vector map</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Word_cloud.html">Word cloud</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Creating_links_between_pages.html">Creating links between pages</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Making_visualizations_interactive.html">Making visualizations interactive</a>
+
+            </li>
+                            </ul>
+            </li>
+                                                <li class="collapsed">
+        <a class="ht-nav-page-link" href="Programmer&apos;s_Guide.html">Programmer's Guide</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Concepts_Guide.html">Concepts Guide</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Application.html">Application</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Flow.html">Flow</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Source.html">Source</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Stream.html">Stream</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Type.html">Type</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Event.html">Event</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Window.html">Window</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Continuous_query_(CQ).html">Continuous query (CQ)</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Cache.html">Cache</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="WAction_and_WActionStore.html">WAction and WActionStore</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Target.html">Target</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Subscription.html">Subscription</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Sample_Applications_Guide.html">Sample Applications Guide</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="PosApp.html">PosApp</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="PosAppDash.html">PosAppDash</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MultiLogApp.html">MultiLogApp</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MultiLogDash.html">MultiLogDash</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Fundamentals_of_TQL_programming.html">Fundamentals of TQL programming</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="TQL_programming_rules_and_best_practices.html">TQL programming rules and best practices</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Writing_a_simple_TQL_application.html">Writing a simple TQL application</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Loading_and_reloading_TQL_applications_during_development.html">Loading and reloading TQL applications during development</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Parsing_the_data_field_of_WAEvent.html">Parsing the data field of WAEvent</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_regular_expressions_(regex).html">Using regular expressions (regex)</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Sending_alerts.html">Sending alerts</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Handling_exceptions.html">Handling exceptions</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Intermediate_TQL_programming__common_patterns.html">Intermediate TQL programming: common patterns</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Getting_data_from_sources.html">Getting data from sources</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Parsing_sources_with_regular_expressions.html">Parsing sources with regular expressions</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Bounding_data_with_windows.html">Bounding data with windows</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_a_window_to_define_an_alert_threshold.html">Using a window to define an alert threshold</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Joining_cache_data_with_CQs.html">Joining cache data with CQs</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Filtering_data_with_CQs.html">Filtering data with CQs</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Filtering_events_using_OUTPUT_TO_and_WHERE.html">Filtering events using OUTPUT TO and WHERE</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Aggregating_data_with_CQs.html">Aggregating data with CQs</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Handling_nulls_with_CQs.html">Handling nulls with CQs</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Handling_variable-length_events_with_CQs.html">Handling variable-length events with CQs</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Sending_data_to_targets.html">Sending data to targets</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Sending_data_to_WActionStores.html">Sending data to WActionStores</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_FIRST_and_LAST.html">Using FIRST and LAST</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Advanced_TQL_programming.html">Advanced TQL programming</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Adapting_TQL_applications_for_multi-node_deployment.html">Adapting TQL applications for multi-node deployment</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_the_Striim_Forwarding_Agent.html">Using the Striim Forwarding Agent</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Using_imported_Java_functions.html">Using imported Java functions</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Setting_up_your_development_environment.html">Setting up your development environment</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Developing_single-row_functions.html">Developing single-row functions</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Developing_multi-row_functions.html">Developing multi-row functions</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Understanding_windows_in_custom_functions.html">Understanding windows in custom functions</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Understanding_logging_in_custom_functions.html">Understanding logging in custom functions</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Importing_custom_functions_in_the_web_UI.html">Importing custom functions in the web UI</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_analytics_and_regression_functions.html">Using analytics and regression functions</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_namespaces.html">Using namespaces</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_the_DATA()_function.html">Using the DATA() function</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_the_META()_function.html">Using the META() function</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_ITERATOR.html">Using ITERATOR</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_EVENTLIST.html">Using EVENTLIST</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_pattern_matching.html">Using pattern matching</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_Apache_Flume.html">Using Apache Flume</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_the_Java_event_publishing_API.html">Using the Java event publishing API</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Querying_a_WActionstore_using_the_REST_API.html">Querying a WActionstore using the REST API</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="TQL_reference.html">TQL reference</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Supported_data_types.html">Supported data types</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Operators.html">Operators</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Functions.html">Functions</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="List_of_reserved_keywords.html">List of reserved keywords</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="DDL_and_component_reference.html">DDL and component reference</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="ALTER_and_RECOMPILE.html">ALTER and RECOMPILE</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_APPLICATION_..._END_APPLICATION.html">CREATE APPLICATION ... END APPLICATION</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_CACHE.html">CREATE CACHE</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_CQ_(query).html">CREATE CQ (query)</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_DASHBOARD.html">CREATE DASHBOARD</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_FLOW_..._END_FLOW.html">CREATE FLOW ... END FLOW</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_OR_REPLACE.html">CREATE OR REPLACE</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_PROPERTYVARIABLE.html">CREATE PROPERTYVARIABLE</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_SORTER.html">CREATE SORTER</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_SOURCE.html">CREATE SOURCE</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="CREATE_STREAM.html">CREATE STREAM</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Persisting_a_stream_to_Kafka.html">Persisting a stream to Kafka</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_SUBSCRIPTION.html">CREATE SUBSCRIPTION</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_TARGET.html">CREATE TARGET</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_TYPE.html">CREATE TYPE</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CREATE_WACTIONSTORE.html">CREATE WACTIONSTORE</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="CREATE_WINDOW.html">CREATE WINDOW</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Advanced_window_settings_(RANGE___Timeout).html">Advanced window settings (RANGE / Timeout)</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Supported_combinations_of_window_mode_and_size_properties.html">Supported combinations of window mode and size properties</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="DROP.html">DROP</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="IMPORT.html">IMPORT</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Adapters_reference.html">Adapters reference</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Readers.html">Readers</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="DatabaseReader.html">DatabaseReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="FileReader.html">FileReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HDFSReader.html">HDFSReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HP_NonStop_Enscribe,_SQL_MP,_and_SQL_MX_Readers.html">HP NonStop Enscribe, SQL/MP, and SQL/MX Readers</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HTTPReader.html">HTTPReader</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="JMSReader.html">JMSReader</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_JMSReader_with_IBM_WebSphere_MQ.html">Using JMSReader with IBM WebSphere MQ</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="KafkaReader.html">KafkaReader</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Reading_a_Kafka_stream_with_KafkaReader.html">Reading a Kafka stream with KafkaReader</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MQTTReader.html">MQTTReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MSSQLReader.html">MSSQLReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MultiFileReader.html">MultiFileReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MySQLReader.html">MySQLReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="OracleReader.html">OracleReader</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="SalesforceReader.html">SalesforceReader</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Replicating_Salesforce_data_to_Oracle_with_DatabaseWriter.html">Replicating Salesforce data to Oracle with DatabaseWriter</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="TCPReader.html">TCPReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="UDPReader.html">UDPReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="WindowsEventLogReader.html">WindowsEventLogReader</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Parsers.html">Parsers</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Supported_reader-parser_combinations.html">Supported reader-parser combinations</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="AAL_(Apache_access_log)_Parser.html">AAL (Apache access log) Parser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="AvroParser.html">AvroParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="BinaryParser.html">BinaryParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="CollectdParser.html">CollectdParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="DSVParser.html">DSVParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="FreeFormTextParser.html">FreeFormTextParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="GGTrailParser.html">GGTrailParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="JSONParser.html">JSONParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="NetflowParser.html">NetflowParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="NVP_(name-value_pair)_Parser.html">NVP (name-value pair) Parser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="SNMPParser.html">SNMPParser</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="XMLParser.html">XMLParser</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Writers.html">Writers</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="DatabaseWriter.html">DatabaseWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="FileWriter.html">FileWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HBaseWriter.html">HBaseWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HDFSWriter.html">HDFSWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="JPAWriter.html">JPAWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="JMSWriter.html">JMSWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="KafkaWriter.html">KafkaWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MQTTWriter.html">MQTTWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="RedShiftWriter.html">RedShiftWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="S3Writer.html">S3Writer</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="SysOut.html">SysOut</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="VerticaWriter.html">VerticaWriter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Setting_directory,_filename,_and_rolloverpolicy_for_writers.html">Setting directory, filename, and rolloverpolicy for writers</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Formatters.html">Formatters</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Supported_writer-formatter_combinations.html">Supported writer-formatter combinations</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="AVROFormatter.html">AVROFormatter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="DSVFormatter.html">DSVFormatter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="JSONFormatter.html">JSONFormatter</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="XMLFormatter.html">XMLFormatter</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Setting_rowdelimiter_values.html">Setting rowdelimiter values</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Encrypted_passwords.html">Encrypted passwords</a>
+
+            </li>
+                            </ul>
+            </li>
+                            </ul>
+            </li>
+                                                <li class="leaf">
+        <a class="ht-nav-page-link" href="Console_commands.html">Console commands</a>
+
+            </li>
+                                                <li class="collapsed">
+        <a class="ht-nav-page-link" href="Change_Data_Capture_Guide.html">Change Data Capture Guide</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link current" href="What_is_change_data_capture_.html">What is change data capture?</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Working_with_change_data_capture_readers.html">Working with change data capture readers</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="WAEvent_contents_for_change_data.html">WAEvent contents for change data</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Parsing_the_fields_of_WAEvent_for_CDC_readers.html">Parsing the fields of WAEvent for CDC readers</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Sample_TQL_application_using_change_data.html">Sample TQL application using change data</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Reading_from_multiple_tables.html">Reading from multiple tables</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_the_MAP_function.html">Using the MAP function</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Creating_applications_with_the_App_Wizard.html">Creating applications with the App Wizard</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_Advanced_Setup_to_map_columns_to_fields.html">Using Advanced Setup to map columns to fields</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_Advanced_Setup_to_filter_data_based_on_table_values.html">Using Advanced Setup to filter data based on table values</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_Advanced_Setup_to_filter_data_based_on_WAEvent_values.html">Using Advanced Setup to filter data based on WAEvent values</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="HP_NonStop.html">HP NonStop</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Setting_up_HP_NonStop_with_the_Striim_agent.html">Setting up HP NonStop with the Striim agent</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HP_NonStop_reader_properties.html">HP NonStop reader properties</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HP_NonStop_reader_WAEvent_fields.html">HP NonStop reader WAEvent fields</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HPNonStopEnscribeReader_data_type_support_and_conversion_reference.html">HPNonStopEnscribeReader data type support and conversion reference</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HPNonStopSQLMPReader_data_type_support_and_conversion_reference.html">HPNonStopSQLMPReader data type support and conversion reference</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="HPNonStopSQLMXReader_data_type_support_and_conversion_reference.html">HPNonStopSQLMXReader data type support and conversion reference</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Microsoft_SQL_Server.html">Microsoft SQL Server</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Microsoft_SQL_Server_setup.html">Microsoft SQL Server setup</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MSSQLReader_properties.html">MSSQLReader properties</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MSSQLReader_WAEvent_fields.html">MSSQLReader WAEvent fields</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MSSQLReader_simple_application.html">MSSQLReader simple application</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MSSQLReader_example_output.html">MSSQLReader example output</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MSSQLReader_data_type_support_and_conversion_reference.html">MSSQLReader data type support and conversion reference</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="MySQL.html">MySQL</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MySQL_setup.html">MySQL setup</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MySQLReader_properties.html">MySQLReader properties</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MySQLReader_WAEvent_fields.html">MySQLReader WAEvent fields</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MySQLReader_simple_application.html">MySQLReader simple application</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MySQLReader_example_output.html">MySQLReader example output</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="MySQLReader_data_type_support_and_conversion_reference.html">MySQLReader data type support and conversion reference</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Oracle_Database.html">Oracle Database</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Oracle_configuration.html">Oracle configuration</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Basic_Oracle_configuration_tasks.html">Basic Oracle configuration tasks</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Configuring_Oracle_LogMiner.html">Configuring Oracle LogMiner</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Configuring_Oracle_XStream_Out.html">Configuring Oracle XStream Out</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="OracleReader_properties.html">OracleReader properties</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="OracleReader_WAEvent_fields.html">OracleReader WAEvent fields</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="OracleReader_simple_application.html">OracleReader simple application</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="OracleReader_example_output.html">OracleReader example output</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="OracleReader_data_type_support_and_conversion_reference.html">OracleReader data type support and conversion reference</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Runtime_considerations_when_using_OracleReader.html">Runtime considerations when using OracleReader</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_the_DATA()_and_BEFORE()_functions.html">Using the DATA() and BEFORE() functions</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Replicating_Oracle_data_to_Amazon_RedShift.html">Replicating Oracle data to Amazon RedShift</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Replicating_data_from_one_Oracle_instance_to_another.html">Replicating data from one Oracle instance to another</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Replicating_Oracle_data_to_HBase.html">Replicating Oracle data to HBase</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Oracle_GoldenGate.html">Oracle GoldenGate</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Running_GoldenGateTrailParser_on_the_GoldenGate_host.html">Running GoldenGateTrailParser on the GoldenGate host</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="GoldenGateTrailParser_properties.html">GoldenGateTrailParser properties</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="GoldenGateTrailParser_sample_application_and_output.html">GoldenGateTrailParser sample application and output</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Writing_raw_CDC_data_to_Hive.html">Writing raw CDC data to Hive</a>
+
+            </li>
+                            </ul>
+            </li>
+                                                <li class="collapsed">
+        <a class="ht-nav-page-link" href="Administrator&apos;s_Guide.html">Administrator's Guide</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Starting_and_stopping_Striim.html">Starting and stopping Striim</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Managing_users,_permissions,_and_roles.html">Managing users, permissions, and roles</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Managing_deployment_groups.html">Managing deployment groups</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Loading_standalone_sources,_caches,_and_WActionStores.html">Loading standalone sources, caches, and WActionStores</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Monitoring_cluster_performance.html">Monitoring cluster performance</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Understanding_reported_CPU_usage.html">Understanding reported CPU usage</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Monitoring_using_the_console.html">Monitoring using the console</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Monitoring_using_the_system_health_REST_API.html">Monitoring using the system health REST API</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Monitoring_using_the_web_UI.html">Monitoring using the web UI</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Reading_log_files.html">Reading log files</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Changing_the_log_level.html">Changing the log level</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Managing_the_application_lifecycle.html">Managing the application lifecycle</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Backing_up_and_restoring_a_cluster.html">Backing up and restoring a cluster</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Replaying_events_using_Kafka_streams.html">Replaying events using Kafka streams</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Continuing_operation_after_node_failure.html">Continuing operation after node failure</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Recovering_from_cluster_failures.html">Recovering from cluster failures</a>
+
+            </li>
+                            </ul>
+            </li>
+                                                <li class="collapsed">
+        <a class="ht-nav-page-link" href="Installation_and_Configuration_Guide.html">Installation and Configuration Guide</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="System_requirements.html">System requirements</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Creating_a_node_in_CentOS.html">Creating a node in CentOS</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Creating_a_node_in_Ubuntu.html">Creating a node in Ubuntu</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Running_Striim_as_a_process.html">Running Striim as a process</a>
+
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Configuring_Striim.html">Configuring Striim</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Installing_database_drivers.html">Installing database drivers</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_Hive_JDBC_driver.html">Installing the Hive JDBC driver</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_Microsoft_JDBC_driver.html">Installing the Microsoft JDBC driver</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_MongoDB_JDBC_driver.html">Installing the MongoDB JDBC driver</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_MySQL_JDBC_driver.html">Installing the MySQL JDBC driver</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_Oracle_Instant_Client.html">Installing the Oracle Instant Client</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_Oracle_JDBC_driver.html">Installing the Oracle JDBC driver</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_RedShift_JDBC_driver.html">Installing the RedShift JDBC driver</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_Vertica_driver.html">Installing the Vertica driver</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Changing_the_amount_of_memory_available_to_a_Striim_node.html">Changing the amount of memory available to a Striim node</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Using_TCP_IP_instead_of_multicast_UDP.html">Using TCP/IP instead of multicast UDP</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Changing_the_web_UI_ports.html">Changing the web UI ports</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Securing_the_web_UI_with_HTTPS.html">Securing the web UI with HTTPS</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Enabling_LDAP_authentication.html">Enabling LDAP authentication</a>
+
+            </li>
+                            </ul>
+            </li>
+                                        <li class="collapsed">
+        <a class="ht-nav-page-link" href="Configuring_remote_hosts.html">Configuring remote hosts</a>
+
+                    <span class="sp-toggle sp-aui-icon-small ht-pages-nav-toggle">
+                <svg id="icon-minus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+                <svg id="icon-plus" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <g fill="#CCCCCC">
+                        <rect x="11" y="7" width="2" height="10"></rect>
+                        <rect x="7" y="11" width="10" height="2"></rect>
+                    </g>
+                </svg>
+            </span>
+
+            <ul class="nav ht-pages-nav-sub">
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Apache_Flume_integration.html">Apache Flume integration</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="collectd_configuration.html">collectd configuration</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="SNMP_configuration.html">SNMP configuration</a>
+
+            </li>
+                                        <li class="leaf">
+        <a class="ht-nav-page-link" href="Installing_the_Striim_Forwarding_Agent.html">Installing the Striim Forwarding Agent</a>
+
+            </li>
+                            </ul>
+            </li>
+                            </ul>
+            </li>
+                                                <li class="leaf">
+        <a class="ht-nav-page-link" href="Glossary.html">Glossary</a>
+
+            </li>
+                                                <li class="leaf">
+        <a class="ht-nav-page-link" href="What&apos;s_new_in_Striim_3.6.1.html">What's new in Striim 3.6.1</a>
+
+            </li>
+                                    </ul>
+            </nav>
+        </div>
+    </div>
+
+</aside></div>
+
+<div id="ht-wrap-container">
+
+            
+    <div id="ht-sidebar-dragbar">
+    <div class="ht-sidebar-drag-handle">
+        <span class="drag-handle-1"></span>
+        <span class="drag-handle-2"></span>
+        <span class="drag-handle-3"></span>
+    </div>
+</div>
+    <article id="ht-content" class="ht-content">
+        <header class="ht-content-header">
+            <div id="ht-breadcrumb">
+    <ul>
+        <li><a href="Striim_documentation.html">Striim 3.6.1 documentation</a></li>
+                                                                                     <li><a href="Change_Data_Capture_Guide.html">Change Data Capture Guide</a></li>
+                                                            </ul>
+</div>            <h1 id="src-14093530"> <span>What is change data capture?</span></h1>
+        </header>
+
+        <div id="main-content" class="wiki-content" data-index-for-search="true">
+    <p  >Database management systems originally kept logs of inserted, updated, and deleted data so that changes could be rolled back as necessary to maintain relational integrity. As DBMS technology evolved, additional changes were added to the logs, and today they may track virtually every action in the system, including transaction start and commit, uncompleted transactions, rollbacks, and changes to table DDL.    </p>
+    <p  >DBMS vendors and third parties have found additional uses for these logs. Striim, for example, can extract change data from logs in real time in order to make information available before the DBMS has finished processing it, at the same time minimizing the performance load on the RBMS by avoiding additional queries. There are many potential uses for this information, such raising alerts about error conditions sooner and double-checking DBMS operations in order to identify lost data.    </p>
+        </div>
+
+    </article>
+
+
+            <nav id="ht-post-nav">
+                <a href="Change_Data_Capture_Guide.html" class="ht-post-nav-prev">
+            <svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+                <g id="ht-icon-prev" sketch:type="MSArtboardGroup">
+                    <path fill="#000000" d="M16,8 L16,6 L6,6 L6,16 L8,16 L8,8 L16,8 Z" id="Rectangle-2"
+                          sketch:type="MSShapeGroup"
+                          transform="translate(11.000000, 11.000000) rotate(-45.000000) translate(-11.000000, -11.000000) "></path>
+                </g>
+            </svg>
+            <span>Change Data Capture Guide</span>
+        </a>
+                <a href="Working_with_change_data_capture_readers.html" class="ht-post-nav-next">
+            <svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+                <g id="ht-icon-next" sketch:type="MSArtboardGroup">
+                    <path fill="#000000" d="M16,8 L16,6 L6,6 L6,16 L8,16 L8,8 L16,8 Z" id="Rectangle-2"
+                          sketch:type="MSShapeGroup"
+                          transform="translate(11.000000, 11.000000) rotate(-225.000000) translate(-11.000000, -11.000000) "></path>
+                </g>
+            </svg>
+            <span>Working with change data capture readers</span>
+        </a>
+    </nav>    
+            
+            <article id="html-search-results" class="ht-content" style="display: none;">
+            <header class="ht-content-header">
+                <div id="ht-spacetitle">
+                    <ul>
+                        <li><a href="Striim_documentation.html">Striim 3.6.1 documentation</a></li>
+                    </ul>
+                </div>
+                <h1>Search results</h1>
+            </header>
+            <div id="search-results"></div>
+        </article>
+    
+    <footer id="ht-footer">
+    <a href="#" id="ht-jump-top" class="sp-aui-icon-small sp-aui-iconfont-arrows-up"></a>
+</footer></div>
+
+<div>
+    <div id="ht-mq-detect"></div>
+</div>
+
+    <script src="js/lunr.js"></script>
+    <script src="js/lunr-extras.js"></script>
+    <script src="assets/js/scroll-search.js"></script>
+
+</body>
+</html>
