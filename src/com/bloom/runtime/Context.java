@@ -42,6 +42,7 @@ import com.bloom.exception.CompilationException;
 import com.bloom.exception.FatalException;
 import com.bloom.exception.SecurityException;
 import com.bloom.exception.Warning;
+import com.bloom.intf.QueryManager;
 import com.bloom.intf.QueryManager.QueryProjection;
 import com.bloom.intf.QueryManager.TYPE;
 import com.bloom.metaRepository.HazelcastSingleton;
@@ -71,6 +72,7 @@ import com.bloom.runtime.components.EntityType;
 import com.bloom.runtime.components.FlowComponent;
 import com.bloom.runtime.components.MetaObjectPermissionChecker;
 import com.bloom.runtime.containers.TaskEvent;
+import com.bloom.runtime.exceptions.ErrorCode;
 import com.bloom.runtime.exceptions.ErrorCode.Error;
 import com.bloom.runtime.meta.CQExecutionPlan;
 import com.bloom.runtime.meta.CQExecutionPlan.CQExecutionPlanFactory;
@@ -97,7 +99,6 @@ import com.bloom.runtime.meta.MetaInfo.PropertyVariable;
 import com.bloom.runtime.meta.MetaInfo.Query;
 import com.bloom.runtime.meta.MetaInfo.QueryVisualization;
 import com.bloom.runtime.meta.MetaInfo.Role;
-import com.bloom.runtime.meta.MetaInfo.Server;
 import com.bloom.runtime.meta.MetaInfo.ShowStream;
 import com.bloom.runtime.meta.MetaInfo.Sorter;
 import com.bloom.runtime.meta.MetaInfo.Sorter.SorterRule;
@@ -633,7 +634,7 @@ public class Context
     MetaInfo.DeploymentGroup dg;
     if (deploymentGroup == null)
     {
-      MetaInfo.DeploymentGroup dg = (MetaInfo.DeploymentGroup)getMetaObject(EntityType.DG, "Global", "default");
+      dg = (MetaInfo.DeploymentGroup)getMetaObject(EntityType.DG, "Global", "default");
       if (dg == null) {
         throw new FatalException("Invoking adhoc on not deployed object.");
       }
@@ -724,7 +725,7 @@ public class Context
     return namespaceAndName;
   }
   
-  public <T extends MetaInfo.MetaObject> T get(String name, EntityType type)
+  public MetaInfo.MetaObject get(String name, EntityType type)
     throws MetaDataRepositoryException
   {
     String[] namespaceAndName = splitNamespaceAndName(name, type);
@@ -1437,7 +1438,7 @@ public class Context
     return newwindow;
   }
   
-  public MetaInfo.CQ putCQ(boolean doReplace, ObjectName objectName, UUID outputStream, CQExecutionPlan plan, String select, List<String> fieldList, MetaInfoStatus statusOfObjects)
+  public MetaInfo.CQ putCQ(boolean doReplace, ObjectName objectName, UUID outputStream, CQExecutionPlan plan, String select, List fieldList, MetaInfoStatus statusOfObjects)
     throws MetaDataRepositoryException
   {
     String name = addSchemaPrefix(objectName);
@@ -1854,7 +1855,7 @@ public class Context
       }
       catch (Exception e)
       {
-        throw e;
+        e.printStackTrace();
       }
       this.recompileMode = false;
       return;
@@ -2185,8 +2186,9 @@ public class Context
     }
     catch (Exception e) {}
     if (appMetaObject.objects.get(EntityType.FLOW) != null) {
-      for (UUID flowUUID : (LinkedHashSet)appMetaObject.objects.get(EntityType.FLOW))
+      for (Iterator iter = ((LinkedHashSet)appMetaObject.objects.get(EntityType.FLOW)).iterator();iter.hasNext();)
       {
+    	  	UUID flowUUID = (UUID)iter.next();
         MetaInfo.Flow flowMetaObject = (MetaInfo.Flow)getObject(flowUUID);
         if (flowMetaObject != null) {
           if (flowMetaObject.getMetaInfoStatus().isValid())
@@ -2215,9 +2217,11 @@ public class Context
       createOrEndApplicationOrFlow(appMetaObject, false);
     }
     catch (Exception e) {}
-    EntityType entityType;
-    for (entityType : EntityType.orderOfRecompile)
+    
+    for (int i = 0; i < EntityType.orderOfRecompile.length; i++)
     {
+    	
+    	  EntityType entityType = EntityType.orderOfRecompile[i];
       try
       {
         alterOrEndFlow(appMetaObject, true);
@@ -2639,14 +2643,12 @@ public class Context
   private String objectFullName(EntityType objType, String objectName)
   {
     String name;
-    String name;
     if (objType == EntityType.DG)
     {
       name = objectName;
     }
     else
     {
-      String name;
       if ((objType != EntityType.NAMESPACE) && (objectName.split("\\.").length == 1)) {
         name = addSchemaPrefix(null, objectName);
       } else {
@@ -3392,7 +3394,6 @@ public class Context
     }
     HazelcastInstance hz = HazelcastSingleton.get();
     Set<Member> srvs;
-    Set<Member> srvs;
     if (where.equalsIgnoreCase("ALL"))
     {
       srvs = DistributedExecutionManager.getAllServers(hz);
@@ -3496,7 +3497,8 @@ public class Context
     List<MetaInfo.Query> resultSet = new ArrayList();
     Set<MetaInfo.Query> metaDataQueryResult = this.metadataRepository.getByEntityType(EntityType.QUERY, authToken);
     QueryManager.TYPE entityType;
-    for (entityType : entityTypes) {
+    for (int i = 0; i < entityTypes.length; i++) {
+    		entityType = entityTypes[i];
       for (MetaInfo.Query query : metaDataQueryResult)
       {
         if ((query.isAdhocQuery()) && (entityType == QueryManager.TYPE.ADHOC)) {
