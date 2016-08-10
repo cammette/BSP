@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.bloom.runtime.IPartitionManager;
-
+/*
+ * 平台自建的Index和K,V结构
+ */
 public class WAIndex<I, K, V>
 {
   Type type;
