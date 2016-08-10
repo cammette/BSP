@@ -44,7 +44,7 @@ import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.javaapi.message.ByteBufferMessageSet;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
-import kafka.utils.ZKStringSerializer;
+import kafka.utils.ZKStringSerializer$;
 
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -94,15 +94,14 @@ public class KafkaStreamUtils
       return Boolean.valueOf(KafkaStreamUtils.deleteTopic(this.streamObject));
     }
   }
-  
+  // 获得元信息的属性集合
   public static MetaInfo.PropertySet getPropertySet(MetaInfo.Stream streamInfo)
   {
     String name;
     String namespace;
-    String name;
     if (streamInfo.pset.indexOf(".") == -1)
     {
-      String namespace = streamInfo.getNsName();
+      namespace = streamInfo.getNsName();
       name = streamInfo.pset;
     }
     else
@@ -172,7 +171,7 @@ public class KafkaStreamUtils
     String topicName;
     try
     {
-      zkClient = new ZkClient(zk_address_list, KafkaConstants.session_timeout, KafkaConstants.connection_timeout, ZKStringSerializer..MODULE$);
+      zkClient = new ZkClient(zk_address_list, KafkaConstants.session_timeout, KafkaConstants.connection_timeout, ZKStringSerializer$.MODULE$);
       int numPartitions = getPartitionsCount(streamObject, kafka_propset);
       if (logger.isInfoEnabled()) {
         logger.info("Creating kafka topic with " + numPartitions + " partitions");
@@ -191,8 +190,8 @@ public class KafkaStreamUtils
     }
     catch (TopicExistsException e)
     {
-      
-      return 0;
+      // topic 已经存在, 所以返回为 false
+      return false;
     }
     catch (Exception e)
     {
@@ -290,7 +289,7 @@ public class KafkaStreamUtils
     ZkClient zkClient = null;
     try
     {
-      zkClient = new ZkClient(zk_address, KafkaConstants.session_timeout, KafkaConstants.connection_timeout, ZKStringSerializer..MODULE$);
+      zkClient = new ZkClient(zk_address, KafkaConstants.session_timeout, KafkaConstants.connection_timeout, ZKStringSerializer$.MODULE$);
       String topic_name = createTopicName(streamInfo);
       AdminUtils.deleteTopic(zkClient, topic_name);
       String checkpoint_name = getCheckpointTopicName(topic_name);
@@ -299,7 +298,7 @@ public class KafkaStreamUtils
     }
     catch (Exception e)
     {
-      throw e;
+    		e.printStackTrace();
     }
     finally
     {
@@ -307,6 +306,8 @@ public class KafkaStreamUtils
         zkClient.close();
       }
     }
+    // 默认设置返回值
+    return false;
   }
   
   public static CreateTopic getCreateTopicExecutor(MetaInfo.Stream streamObject)
@@ -390,7 +391,7 @@ public class KafkaStreamUtils
     throws InterruptedException
   {
     TopicMetadata result = null;
-    for (Iterator i$ = kafkaBrokers.iterator(); i$.hasNext(); maxRetries > 0)
+    for (Iterator i$ = kafkaBrokers.iterator(); i$.hasNext(); )
     {
       String seed = (String)i$.next();
       
@@ -398,6 +399,7 @@ public class KafkaStreamUtils
       String host = ip_port[0];
       int port = Integer.parseInt(ip_port[1]);
       SimpleConsumer consumer = null;
+      // 最大重试次数为3次
       short maxRetries = 3;
       try
       {

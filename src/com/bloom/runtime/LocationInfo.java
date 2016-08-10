@@ -1,5 +1,7 @@
 package com.bloom.runtime;
-
+/*
+ * 此类定义了位置信息, 用于LBS等服务.
+ */
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class LocationInfo

@@ -12,6 +12,7 @@ import com.bloom.runtime.utils.NamePolicy;
 import com.bloom.security.WASecurityManager;
 import com.bloom.uuid.UUID;
 import com.bloom.runtime.RecordKey;
+import com.bloom.classloading.BundleDefinition;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

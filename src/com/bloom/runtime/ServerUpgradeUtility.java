@@ -121,7 +121,7 @@ public class ServerUpgradeUtility
     return this.metaDataRepository.getMetaObjectByUUID(uuid, WASecurityManager.TOKEN);
   }
   
-  public <T extends MetaInfo.MetaObject> T getObjectInfo(UUID uuid, EntityType type)
+  public MetaInfo.MetaObject getObjectInfo(UUID uuid, EntityType type)
     throws ServerException, MetaDataRepositoryException
   {
     MetaInfo.MetaObject o = getObject(uuid);

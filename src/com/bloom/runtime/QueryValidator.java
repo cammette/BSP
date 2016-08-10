@@ -1,5 +1,6 @@
 package com.bloom.runtime;
 
+import com.bloom.drop.DropMetaObject;
 import com.bloom.drop.DropMetaObject.DropRule;
 import com.bloom.exception.FatalException;
 import com.bloom.exception.SecurityException;
@@ -763,7 +764,6 @@ public class QueryValidator
       logger.info("CreateSourceStatement_New (token " + token + ", entityName " + sourceNameWithoutDomain + ", replace " + r + " )");
     }
     String str;
-    String str;
     if ((parserType != null) && (parserProps != null)) {
       str = Utility.createSourceStatementText(sourceNameWithoutDomain, r, adapType, adapProps, parserType, parserProps, instream, null);
     } else {
@@ -1035,9 +1035,10 @@ public class QueryValidator
   public List<MetaInfo.MetaObject> getAllObjectsByEntityType(String[] eTypes, AuthToken token)
     throws MetaDataRepositoryException
   {
+	  List<MetaInfo.MetaObject> mObjects;
     if ((eTypes instanceof String[]))
     {
-      List<MetaInfo.MetaObject> mObjects = new ArrayList();
+       mObjects = new ArrayList();
       for (String eType : eTypes)
       {
         Set<MetaInfo.MetaObject> metaObjectSet = this.metadataRepository.getByEntityType(EntityType.forObject(eType), token);
@@ -1050,7 +1051,7 @@ public class QueryValidator
     {
       throw new RuntimeException("Expected String Array, Passed : " + eTypes.getClass().toString());
     }
-    List<MetaInfo.MetaObject> mObjects;
+    
     if (mObjects != null)
     {
       Set<? extends MetaInfo.MetaObject> result = Utility.removeInternalApplications(new HashSet(mObjects));
@@ -1638,7 +1639,6 @@ public class QueryValidator
   {
     MetaInfo.Dashboard dashBoardMetaObject = (MetaInfo.Dashboard)this.metadataRepository.getMetaObjectByName(EntityType.DASHBOARD, namespace, objectName, null, token);
     boolean isNew;
-    boolean isNew;
     if (dashBoardMetaObject == null)
     {
       assert (!cor.booleanValue());
@@ -2014,7 +2014,7 @@ public class QueryValidator
     l.setAcceptNewLineInStringLiteral(false);
     boolean seenFirstIdentifier = false;
     boolean seenDot = false;
-    isValid = false;
+    boolean isValid = false;
     try
     {
       for (;;)

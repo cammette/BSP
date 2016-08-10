@@ -10,8 +10,6 @@ import com.bloom.runtime.meta.MetaInfo.Initializer;
 import com.bloom.security.WASecurityManager;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.bloom.license.LicenseManager;
-import com.bloom.license.LicenseManager.Option;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -111,8 +109,8 @@ public class NodeStartUp
         Map<String, String> clusterDetails = takeClusterDetails();
         lprop.putAll(clusterDetails);
         
-        Map<String, String> licenseKeyDetails = takeLicenseKeyInfo(lprop);
-        clusterDetails.putAll(licenseKeyDetails);
+//        Map<String, String> licenseKeyDetails = takeLicenseKeyInfo(lprop);
+//        clusterDetails.putAll(licenseKeyDetails);
         if (!clusterDetails.isEmpty())
         {
           HazelcastInstance instance = HazelcastSingleton.get((String)clusterDetails.get(NodeStartUp.InitializerParams.Params.getWAClusterName()));
@@ -148,10 +146,6 @@ public class NodeStartUp
         {
           logger.error("Cluster details were not entered correctly and failed 3 times, please restart the system");
         }
-      }
-      catch (IOException e)
-      {
-        logger.error("Input reader failed!!");
       }
       catch (RuntimeException e)
       {
@@ -211,15 +205,15 @@ public class NodeStartUp
       else if ((ee.equals(ErrorCode.Error.NOLICENSEKEYSET)) || (ee.equals(ErrorCode.Error.NOPRODUCTKEYSET)) || (ee.equals(ErrorCode.Error.NOCOMPANYNAMESET)))
       {
         System.err.println(ee);
-        try
-        {
-          Map<String, String> licenseKeyDetails = takeLicenseKeyInfo(props);
-          props.putAll(licenseKeyDetails);
-        }
-        catch (IOException e1)
-        {
-          logger.error(e1.getMessage());
-        }
+//        try
+//        {
+//          Map<String, String> licenseKeyDetails = takeLicenseKeyInfo(props);
+//          props.putAll(licenseKeyDetails);
+//        }
+//        catch (IOException e1)
+//        {
+//          logger.error(e1.getMessage());
+//        }
       }
     }
   }
@@ -896,91 +890,91 @@ public class NodeStartUp
     return clusterName;
   }
   
-  public Map<String, String> takeLicenseKeyInfo(Properties props)
-    throws IOException
-  {
-    String clusterName = (String)props.get(NodeStartUp.InitializerParams.Params.getWAClusterName());
-    if ((clusterName == null) || (clusterName.isEmpty())) {
-      clusterName = getClusterName();
-    }
-    String companyName = System.getProperty("com.bloom.config.company_name");
-    
-    String licenseKey = System.getProperty("com.bloom.config.license_key");
-    
-    String okProductKey = System.getProperty("com.bloom.config.product_key");
-    
-    Path path = Paths.get(getPlatformHome(), new String[0]);
-    BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, new LinkOption[0]);
-    
-    FileTime creationTime = attributes.lastModifiedTime();
-    
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    String date = dateFormat.format(Long.valueOf(creationTime.toMillis()));
-    
-    long ctime = 0L;
-    try
-    {
-      ctime = dateFormat.parse(date).getTime();
-    }
-    catch (ParseException e1)
-    {
-      logger.error(e1.getLocalizedMessage());
-    }
-    if ((companyName == null) || (companyName.isEmpty())) {
-      companyName = (String)props.get(NodeStartUp.InitializerParams.Params.getCompanyName());
-    }
-    if ((companyName == null) || (companyName.isEmpty()))
-    {
-      System.out.println("Required property \"Company Name\" is undefined");
-      companyName = ConsoleReader.readLineRespond("Enter Company Name : ");
-    }
-    if ((okProductKey == null) || (okProductKey.isEmpty())) {
-      okProductKey = (String)props.get(NodeStartUp.InitializerParams.Params.getProductKey());
-    }
-    if ((okProductKey == null) || (okProductKey.isEmpty())) {
-      okProductKey = LicenseManager.get().createProductKey(companyName, clusterName, ctime);
-    }
-    System.out.println("Product Key " + okProductKey + " registered to " + companyName);
-    
-    Map<String, String> licenseKeyDetails = new HashMap();
-    if ((licenseKey == null) || (licenseKey.isEmpty())) {
-      licenseKey = (String)props.get(NodeStartUp.InitializerParams.Params.getLicenceKey());
-    }
-    if ((licenseKey == null) || (licenseKey.isEmpty()))
-    {
-      licenseKey = ConsoleReader.readLine("Enter License Key : (will generate trial license key if left empty). ");
-      if ((licenseKey == null) || (licenseKey.isEmpty())) {
-        licenseKey = LicenseManager.get().createTrialLicenseKey(clusterName, okProductKey);
-      }
-    }
-    try
-    {
-      LicenseManager lm = LicenseManager.get();
-      LicenseManager.testLicense(lm, "Test", companyName, okProductKey, licenseKey, null, false);
-      if (!lm.allowsOption(LicenseManager.Option.CompanyLicense)) {
-        throw new RuntimeException();
-      }
-    }
-    catch (RuntimeException ignored)
-    {
-      try
-      {
-        LicenseManager.testLicense(LicenseManager.get(), "Test", clusterName, okProductKey, licenseKey, null, false);
-      }
-      catch (RuntimeException e)
-      {
-        System.out.println(e.getMessage());
-        System.exit(1);
-      }
-    }
-    licenseKeyDetails.put(NodeStartUp.InitializerParams.Params.getProductKey(), okProductKey);
-    
-    licenseKeyDetails.put(NodeStartUp.InitializerParams.Params.getLicenceKey(), licenseKey);
-    
-    licenseKeyDetails.put(NodeStartUp.InitializerParams.Params.getCompanyName(), companyName);
-    
-    return licenseKeyDetails;
-  }
+//  public Map<String, String> takeLicenseKeyInfo(Properties props)
+//    throws IOException
+//  {
+//    String clusterName = (String)props.get(NodeStartUp.InitializerParams.Params.getWAClusterName());
+//    if ((clusterName == null) || (clusterName.isEmpty())) {
+//      clusterName = getClusterName();
+//    }
+//    String companyName = System.getProperty("com.bloom.config.company_name");
+//    
+//    String licenseKey = System.getProperty("com.bloom.config.license_key");
+//    
+//    String okProductKey = System.getProperty("com.bloom.config.product_key");
+//    
+//    Path path = Paths.get(getPlatformHome(), new String[0]);
+//    BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, new LinkOption[0]);
+//    
+//    FileTime creationTime = attributes.lastModifiedTime();
+//    
+//    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//    String date = dateFormat.format(Long.valueOf(creationTime.toMillis()));
+//    
+//    long ctime = 0L;
+//    try
+//    {
+//      ctime = dateFormat.parse(date).getTime();
+//    }
+//    catch (ParseException e1)
+//    {
+//      logger.error(e1.getLocalizedMessage());
+//    }
+//    if ((companyName == null) || (companyName.isEmpty())) {
+//      companyName = (String)props.get(NodeStartUp.InitializerParams.Params.getCompanyName());
+//    }
+//    if ((companyName == null) || (companyName.isEmpty()))
+//    {
+//      System.out.println("Required property \"Company Name\" is undefined");
+//      companyName = ConsoleReader.readLineRespond("Enter Company Name : ");
+//    }
+//    if ((okProductKey == null) || (okProductKey.isEmpty())) {
+//      okProductKey = (String)props.get(NodeStartUp.InitializerParams.Params.getProductKey());
+//    }
+//    if ((okProductKey == null) || (okProductKey.isEmpty())) {
+//      okProductKey = LicenseManager.get().createProductKey(companyName, clusterName, ctime);
+//    }
+//    System.out.println("Product Key " + okProductKey + " registered to " + companyName);
+//    
+//    Map<String, String> licenseKeyDetails = new HashMap();
+//    if ((licenseKey == null) || (licenseKey.isEmpty())) {
+//      licenseKey = (String)props.get(NodeStartUp.InitializerParams.Params.getLicenceKey());
+//    }
+//    if ((licenseKey == null) || (licenseKey.isEmpty()))
+//    {
+//      licenseKey = ConsoleReader.readLine("Enter License Key : (will generate trial license key if left empty). ");
+//      if ((licenseKey == null) || (licenseKey.isEmpty())) {
+//        licenseKey = LicenseManager.get().createTrialLicenseKey(clusterName, okProductKey);
+//      }
+//    }
+//    try
+//    {
+//      LicenseManager lm = LicenseManager.get();
+//      LicenseManager.testLicense(lm, "Test", companyName, okProductKey, licenseKey, null, false);
+//      if (!lm.allowsOption(LicenseManager.Option.CompanyLicense)) {
+//        throw new RuntimeException();
+//      }
+//    }
+//    catch (RuntimeException ignored)
+//    {
+//      try
+//      {
+//        LicenseManager.testLicense(LicenseManager.get(), "Test", clusterName, okProductKey, licenseKey, null, false);
+//      }
+//      catch (RuntimeException e)
+//      {
+//        System.out.println(e.getMessage());
+//        System.exit(1);
+//      }
+//    }
+//    licenseKeyDetails.put(NodeStartUp.InitializerParams.Params.getProductKey(), okProductKey);
+//    
+//    licenseKeyDetails.put(NodeStartUp.InitializerParams.Params.getLicenceKey(), licenseKey);
+//    
+//    licenseKeyDetails.put(NodeStartUp.InitializerParams.Params.getCompanyName(), companyName);
+//    
+//    return licenseKeyDetails;
+//  }
   
   public boolean isNodeStarted()
   {

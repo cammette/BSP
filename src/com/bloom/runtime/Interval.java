@@ -32,9 +32,6 @@ public class Interval
     case 48: 
       return yearmonthPat;
     }
-    if (!$assertionsDisabled) {
-      throw new AssertionError();
-    }
     return null;
   }
   
@@ -62,9 +59,6 @@ public class Interval
       return dayminPat;
     case 15: 
       return daysecPat;
-    }
-    if (!$assertionsDisabled) {
-      throw new AssertionError();
     }
     return null;
   }
@@ -181,9 +175,6 @@ public class Interval
     case 11: 
     case 13: 
     default: 
-      if (!$assertionsDisabled) {
-        throw new AssertionError();
-      }
       break;
     }
     long secs = days * 86400L + hours * 3600L + minutes * 60L + seconds;
@@ -217,9 +208,6 @@ public class Interval
       }
       break;
     default: 
-      if (!$assertionsDisabled) {
-        throw new AssertionError();
-      }
       break;
     }
     return new Interval(years * 12 + months);

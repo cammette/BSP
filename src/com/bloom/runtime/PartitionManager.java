@@ -52,7 +52,7 @@ public class PartitionManager
   private static ServerManager serverManager()
   {
     if (serverManager == null) {
-      serverManager = new ServerManager(null);
+      serverManager = new ServerManager();
     }
     return serverManager;
   }
@@ -278,41 +278,10 @@ public class PartitionManager
       }
     }
     
-    /* Error */
+    /* TODO */
     public List<UUID> getAllServers()
     {
-      // Byte code:
-      //   0: aload_0
-      //   1: getfield 11	com/bloom/runtime/PartitionManager$ServerManager:serverGroups	Ljava/util/Set;
-      //   4: dup
-      //   5: astore_1
-      //   6: monitorenter
-      //   7: new 69	java/util/ArrayList
-      //   10: dup
-      //   11: aload_0
-      //   12: getfield 11	com/bloom/runtime/PartitionManager$ServerManager:serverGroups	Ljava/util/Set;
-      //   15: invokespecial 89	java/util/ArrayList:<init>	(Ljava/util/Collection;)V
-      //   18: aload_1
-      //   19: monitorexit
-      //   20: areturn
-      //   21: astore_2
-      //   22: aload_1
-      //   23: monitorexit
-      //   24: aload_2
-      //   25: athrow
-      // Line number table:
-      //   Java source line #236	-> byte code offset #0
-      //   Java source line #237	-> byte code offset #7
-      //   Java source line #238	-> byte code offset #21
-      // Local variable table:
-      //   start	length	slot	name	signature
-      //   0	26	0	this	ServerManager
-      //   5	18	1	Ljava/lang/Object;	Object
-      //   21	4	2	localObject1	Object
-      // Exception table:
-      //   from	to	target	type
-      //   7	20	21	finally
-      //   21	24	21	finally
+      
     }
     
     public void addManagedPartition(PartitionManager manager)
