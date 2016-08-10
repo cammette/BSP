@@ -490,8 +490,7 @@ public class ConsistentHashRing
     for (int i = 0; i < n; i++)
     {
       UUID id = part[i];
-      if ((id == null) && 
-        (!$assertionsDisabled) && (id == null)) {
+      if ((id == null)) {
         throw new AssertionError();
       }
     }
