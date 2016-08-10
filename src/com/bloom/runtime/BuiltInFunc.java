@@ -71,7 +71,6 @@ import org.joda.time.DateTime.Property;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDate.Property;
 import org.joda.time.Period;
 import org.joda.time.ReadablePeriod;
 import org.joda.time.format.DateTimeFormat;
@@ -188,7 +187,6 @@ public abstract class BuiltInFunc
   
   public static DateTime TO_DATEF(Object obj, String format)
   {
-    String value;
     String value;
     if ((obj instanceof String)) {
       value = (String)obj;
@@ -479,7 +477,7 @@ public abstract class BuiltInFunc
     if (pos < 0) {
       throw new IllegalArgumentException("Passed Parameter of type " + places.getClass().getName() + " cannot be converted to int");
     }
-    long factor = Math.pow(10.0D, pos);
+    long factor = (long) Math.pow(10.0D, pos);
     double d = TO_DOUBLE(obj).doubleValue();
     d = Math.round(d * factor);
     return d / factor;
@@ -491,7 +489,7 @@ public abstract class BuiltInFunc
     if (pos < 0) {
       throw new IllegalArgumentException("Passed Parameter of type " + places.getClass().getName() + " cannot be converted to int");
     }
-    long factor = Math.pow(10.0D, pos);
+    long factor = (long) Math.pow(10.0D, pos);
     float f = TO_FLOAT(obj).floatValue();
     f = Math.round(f * (float)factor);
     return f / (float)factor;
@@ -1270,7 +1268,7 @@ public abstract class BuiltInFunc
     return true;
   }
   
-  public static Map<String, GeoSearchCoverTree<Event>> spatialIndices = new HashMap();
+  public static Map<String, GeoSearchCoverTree> spatialIndices = new HashMap();
   @AggHandlerDesc(handler=SumInt.class)
   public abstract Integer sum(Integer paramInteger);
   
@@ -1399,13 +1397,13 @@ public abstract class BuiltInFunc
   public abstract LocationArrayList locInfoList(double paramDouble1, double paramDouble2, String paramString1, String paramString2, String paramString3);
   
   @AggHandlerDesc(handler=Spatial.class)
-  public abstract GeoSearchCoverTree<Event> SPATIAL_INDEX(String paramString, Event paramEvent, double paramDouble1, double paramDouble2);
+  public abstract GeoSearchCoverTree SPATIAL_INDEX(String paramString, Event paramEvent, double paramDouble1, double paramDouble2);
   
   public static class Spatial
   {
-    private GeoSearchCoverTree<Event> search = null;
+    private GeoSearchCoverTree search = null;
     
-    public GeoSearchCoverTree<Event> getAggValue()
+    public GeoSearchCoverTree getAggValue()
     {
       return this.search;
     }
@@ -1439,7 +1437,7 @@ public abstract class BuiltInFunc
   
   public static List<Event> SPATIAL_FIND_IN_RADIUS(String indexName, double lat, double lon, double radiusInM)
   {
-    GeoSearchCoverTree<Event> search = (GeoSearchCoverTree)spatialIndices.get(indexName);
+    GeoSearchCoverTree search = (GeoSearchCoverTree)spatialIndices.get(indexName);
     if (search == null) {
       return Collections.EMPTY_LIST;
     }
@@ -1501,41 +1499,10 @@ public abstract class BuiltInFunc
   {
     LocationArrayList value = new LocationArrayList();
     
-    /* Error */
+    /* TODO */
     public LocationArrayList getAggValue()
     {
-      // Byte code:
-      //   0: aload_0
-      //   1: getfield 4	com/bloom/runtime/BuiltInFunc$GeometryConv:value	Lcom/bloom/runtime/LocationArrayList;
-      //   4: dup
-      //   5: astore_1
-      //   6: monitorenter
-      //   7: new 2	com/bloom/runtime/LocationArrayList
-      //   10: dup
-      //   11: aload_0
-      //   12: getfield 4	com/bloom/runtime/BuiltInFunc$GeometryConv:value	Lcom/bloom/runtime/LocationArrayList;
-      //   15: invokespecial 5	com/bloom/runtime/LocationArrayList:<init>	(Lcom/bloom/runtime/LocationArrayList;)V
-      //   18: aload_1
-      //   19: monitorexit
-      //   20: areturn
-      //   21: astore_2
-      //   22: aload_1
-      //   23: monitorexit
-      //   24: aload_2
-      //   25: athrow
-      // Line number table:
-      //   Java source line #1293	-> byte code offset #0
-      //   Java source line #1294	-> byte code offset #7
-      //   Java source line #1295	-> byte code offset #21
-      // Local variable table:
-      //   start	length	slot	name	signature
-      //   0	26	0	this	GeometryConv
-      //   5	18	1	Ljava/lang/Object;	Object
-      //   21	4	2	localObject1	Object
-      // Exception table:
-      //   from	to	target	type
-      //   7	20	21	finally
-      //   21	24	21	finally
+      
     }
     
     public void incAggValue(double latVal, double longVal, String city, String zip, String companyName)
@@ -1559,39 +1526,10 @@ public abstract class BuiltInFunc
   {
     DoubleArrayList value = new DoubleArrayList();
     
-    /* Error */
+    /* TODO */
     public DoubleArrayList getAggValue()
     {
-      // Byte code:
-      //   0: aload_0
-      //   1: getfield 4	com/bloom/runtime/BuiltInFunc$DblArray:value	Lcern/colt/list/DoubleArrayList;
-      //   4: dup
-      //   5: astore_1
-      //   6: monitorenter
-      //   7: aload_0
-      //   8: getfield 4	com/bloom/runtime/BuiltInFunc$DblArray:value	Lcern/colt/list/DoubleArrayList;
-      //   11: invokevirtual 5	cern/colt/list/DoubleArrayList:copy	()Lcern/colt/list/DoubleArrayList;
-      //   14: aload_1
-      //   15: monitorexit
-      //   16: areturn
-      //   17: astore_2
-      //   18: aload_1
-      //   19: monitorexit
-      //   20: aload_2
-      //   21: athrow
-      // Line number table:
-      //   Java source line #1315	-> byte code offset #0
-      //   Java source line #1316	-> byte code offset #7
-      //   Java source line #1317	-> byte code offset #17
-      // Local variable table:
-      //   start	length	slot	name	signature
-      //   0	22	0	this	DblArray
-      //   5	14	1	Ljava/lang/Object;	Object
-      //   17	4	2	localObject1	Object
-      // Exception table:
-      //   from	to	target	type
-      //   7	16	17	finally
-      //   17	20	17	finally
+      
     }
     
     public void incAggValue(double arg)
