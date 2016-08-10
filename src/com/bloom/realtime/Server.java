@@ -66,7 +66,6 @@ import com.bloom.runtime.meta.MetaInfo.PropertySet;
 import com.bloom.runtime.meta.MetaInfo.PropertyTemplateInfo;
 import com.bloom.runtime.meta.MetaInfo.Query;
 import com.bloom.runtime.meta.MetaInfo.Role;
-import com.bloom.runtime.meta.MetaInfo.Server;
 import com.bloom.runtime.meta.MetaInfo.ShowStream;
 import com.bloom.runtime.meta.MetaInfo.StatusInfo;
 import com.bloom.runtime.meta.MetaInfo.StreamGenerator;
@@ -119,7 +118,7 @@ import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.core.MembershipListener;
 import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
-import com.bloom.license.LicenseManager;
+import com.webaction.license.LicenseManager;
 
 import java.io.Console;
 import java.io.File;
@@ -174,7 +173,7 @@ public class Server
   private static Logger logger = Logger.getLogger(Server.class);
   private final ExecutorService pool;
   private final ScheduledThreadPoolExecutor servicesScheduler;
-  private final Map<UUID, HashMap<UUID, Pair<Publisher, Subscriber>>> userQueryRecords = new HashMap();
+  private final Map<UUID, HashMap<UUID, Pair>> userQueryRecords = new HashMap();
   private static IMap<UUID, UUID> nodeIDToAuthToken;
   private final AuthToken sessionID;
   private final UUID serverID;
@@ -255,17 +254,17 @@ public class Server
     clusterSettings.addEntryListener(this, true);
     initializeMessaging();
   }
-  
-  public static Runnable statsReporter(final String name, ThreadPoolExecutor pool)
+  // 统计报表, 用于统计活跃任务数量, 等待任务数量, 完成任务数量, 队列数量等
+  public static Runnable statsReporter(final String name, final ThreadPoolExecutor pool)
   {
-    new Runnable()
+    return new Runnable()
     {
       public void run()
       {
-        long active = this.val$pool.getActiveCount();
-        long waiting = this.val$pool.getTaskCount();
-        long completed = this.val$pool.getCompletedTaskCount();
-        int queueSize = this.val$pool.getQueue().size();
+        long active = pool.getActiveCount();
+        long waiting = pool.getTaskCount();
+        long completed = pool.getCompletedTaskCount();
+        int queueSize = pool.getQueue().size();
         NetLogger.out().println(name + " scheduler tasks: active=" + active + " waiting=" + waiting + " completed=" + completed + " queueSize=" + queueSize);
       }
     };
@@ -343,7 +342,7 @@ public class Server
   
   private static void initiateShutdown(String reason)
   {
-    String finalReason = reason;
+    final String finalReason = reason;
     try
     {
       Thread t = new Thread(new Runnable()
@@ -352,7 +351,7 @@ public class Server
         {
           try
           {
-            Server.shutDown(this.val$finalReason);
+            Server.shutDown(finalReason);
           }
           catch (Exception e)
           {
@@ -368,14 +367,16 @@ public class Server
       logger.error("error shutting down server", e);
     }
   }
-  
+  /*
+   * EntryListner 对 Entry 的操作进行监听, 然后执行回调函数
+   */
   private void setListeners()
   {
     final Server srv = this;
     
     EntryListener<String, MetaInfo.MetaObject> listener = new EntryListener()
     {
-      public void entryAdded(EntryEvent<String, MetaInfo.MetaObject> e)
+      public void entryAdded(EntryEvent e)
       {
         try
         {
@@ -384,9 +385,9 @@ public class Server
         catch (MetaDataRepositoryException e1) {}
       }
       
-      public void entryEvicted(EntryEvent<String, MetaInfo.MetaObject> e) {}
+      public void entryEvicted(EntryEvent e) {}
       
-      public void entryRemoved(EntryEvent<String, MetaInfo.MetaObject> e)
+      public void entryRemoved(EntryEvent e)
       {
         try
         {
@@ -395,7 +396,7 @@ public class Server
         catch (MetaDataRepositoryException e1) {}
       }
       
-      public void entryUpdated(EntryEvent<String, MetaInfo.MetaObject> e)
+      public void entryUpdated(EntryEvent e)
       {
         try
         {
@@ -415,7 +416,7 @@ public class Server
     
     MessageListener<MetaInfo.ShowStream> showstreamlistener = new MessageListener()
     {
-      public void onMessage(Message<MetaInfo.ShowStream> a)
+      public void onMessage(Message a)
       {
         try
         {
@@ -502,7 +503,7 @@ public class Server
     }
     this.serverToDeploymentGroup.remove(new UUID(removedMember.getUuid()));
   }
-  
+  // 节点故障切换, 首先对应用的元信息流进行部署, 节点管理器对此元信息流可以做到切换
   private void nodeFailover()
     throws Exception
   {
@@ -526,7 +527,6 @@ public class Server
               logger.info(flowMetaInfo.type + " already deployed on this server  " + flowMetaInfo.name + ":" + flowMetaInfo.type + ":" + flowMetaInfo.uuid);
             }
           }
-          continue;
           if (logger.isDebugEnabled()) {
             logger.debug(flowMetaInfo.name + " after deploy");
           }
@@ -662,11 +662,12 @@ public class Server
     lock.lock();
     
     int totalCpus = 0;
-    int allowedCpus = LicenseManager.get().getClusterSize();
+    // 默认设置BSP平台的集群数量为 1
+    int allowedCpus = 1;
     try
     {
       createAdminUserAndRoleSetup();
-      
+      // 从元数据容器中获得元对象的实体类型
       Set<MetaInfo.MetaObject> servers = this.metadataRepository.getByEntityType(EntityType.SERVER, this.sessionID);
       if (servers == null) {
         servers = new HashSet();
@@ -674,7 +675,8 @@ public class Server
       if (!servers.contains(this.ServerInfo)) {
         servers.add(this.ServerInfo);
       }
-      int numberOfNodesAllowed = LicenseManager.get().getNumberOfNodes();
+      // 默认设置BSP平台的节点数量为 10
+      int numberOfNodesAllowed = 10;
       if ((numberOfNodesAllowed != -1) && (servers.size() > numberOfNodesAllowed))
       {
         String message = String.format("\nCannot add this bloom server to the cluster because it would bring the total number of servers to %d.\nThe current license allows up to %d server(s) in the cluster.\n", new Object[] { Integer.valueOf(servers.size()), Integer.valueOf(numberOfNodesAllowed) });
@@ -1091,7 +1093,7 @@ public class Server
     allPermissions.add(globalPermissions);
     return allPermissions;
   }
-  
+  // 加载现有的对象
   public void loadExistingObjects()
     throws Exception
   {
@@ -1107,11 +1109,16 @@ public class Server
       WALoader waLoader = WALoader.get();
       waLoader.setMaxClassId(maxId);
     }
+    // 获得命名空间的实体类型
     Set<MetaInfo.Namespace> namespaces = md.getByEntityType(EntityType.NAMESPACE, this.sessionID);
     Set<UUID> allApplications = new LinkedHashSet();
-    for (Iterator i$ = namespaces.iterator(); i$.hasNext();)
+    
+    MetaInfo.Namespace namespace;
+    Set<UUID> orderOfDeployment = null;
+    // 为命名空间加载对象
+    for (Iterator i = namespaces.iterator(); i.hasNext();)
     {
-      namespace = (MetaInfo.Namespace)i$.next();
+      namespace = (MetaInfo.Namespace)i.next();
       if (logger.isInfoEnabled()) {
         logger.info("Loading objects for namespace: " + namespace.name);
       }
@@ -1175,7 +1182,8 @@ public class Server
                 if (!logger.isInfoEnabled()) {
                   continue;
                 }
-                logger.info("bloom Monitor is not enabled"); continue;
+                logger.info("bloom Monitor is not enabled"); 
+                continue;
               }
             }
             String metaObjectData;
@@ -1188,8 +1196,7 @@ public class Server
         }
       }
     }
-    MetaInfo.Namespace namespace;
-    Set<UUID> orderOfDeployment = null;
+    
     try
     {
       orderOfDeployment = calculateApplicationOrdering(allApplications);
@@ -1249,13 +1256,14 @@ public class Server
       }
     }
   }
-  
+  // 计算应用的顺序
   private LinkedHashSet<UUID> calculateApplicationOrdering(Set<UUID> allApplications)
     throws Exception
   {
     Map<UUID, Set<UUID>> dependentApps = new HashMap();
-    
+    // 依赖应用的对象列表
     Map<UUID, Set<UUID>> objectDependentOfApps = new HashMap();
+    MetaInfo.Flow flowMetaObject;
     for (UUID applicationUUID : allApplications)
     {
       flowMetaObject = (MetaInfo.Flow)getMetaObject(applicationUUID);
@@ -1289,13 +1297,15 @@ public class Server
         }
       }
     }
-    MetaInfo.Flow flowMetaObject;
+    
     for (Iterator i$ = objectDependentOfApps.entrySet().iterator(); i$.hasNext();)
     {
+    	 Map.Entry<UUID, Set<UUID>> objectDependencyMapEntry;
       objectDependencyMapEntry = (Map.Entry)i$.next();
       if (((Set)objectDependencyMapEntry.getValue()).size() > 1) {
-        for (UUID application : (Set)objectDependencyMapEntry.getValue())
+        for (Iterator iter = objectDependencyMapEntry.getValue().iterator(); iter.hasNext();)
         {
+        		UUID application = (UUID)iter.next();
           flowMetaObject = (MetaInfo.Flow)getObject(application);
           Set<UUID> flowObjects = flowMetaObject.getAllObjects();
           if (flowObjects.contains(objectDependencyMapEntry.getKey()))
@@ -1325,8 +1335,7 @@ public class Server
         }
       }
     }
-    Map.Entry<UUID, Set<UUID>> objectDependencyMapEntry;
-    MetaInfo.Flow flowMetaObject;
+   
     LinkedHashSet<UUID> newOrder = new LinkedHashSet();
     
     newOrder.addAll(GraphUtility.topologicalSort(dependentApps));
@@ -1337,7 +1346,7 @@ public class Server
     }
     return newOrder;
   }
-  
+  // 获得临时 URL 的属性列表
   private Set<URL> getListOfPropTempURLs()
   {
     String homeList = System.getProperty("com.bloom.platform.home");
@@ -1350,7 +1359,7 @@ public class Server
     Set<URL> result = Sets.newHashSet();
     for (int i = 0; i < platformHome.length; i++)
     {
-      File platformHomeFile;
+    	  // 平台主目录文件
       File platformHomeFile;
       if (platformHome[i] == null) {
         platformHomeFile = new File(".");
@@ -1494,8 +1503,8 @@ public class Server
       putObject(type);
     }
   }
-  
-  public <T extends MetaInfo.MetaObject> T getObjectInfo(UUID uuid, EntityType type)
+  // 获得元对象的信息
+  public MetaInfo.MetaObject getObjectInfo(UUID uuid, EntityType type)
     throws ServerException, MetaDataRepositoryException
   {
     MetaInfo.MetaObject o = getObject(uuid);
@@ -1667,7 +1676,7 @@ public class Server
     putOpenObject(was);
     return was;
   }
-  
+  // 创建 StoreView 对象存储视图
   public WAStoreView createWAStoreView(MetaInfo.WAStoreView obj)
     throws Exception
   {
@@ -1676,7 +1685,7 @@ public class Server
     putOpenObject(wasview);
     return wasview;
   }
-  
+  // 删除已经部署的对象
   public void removeDeployedObject(FlowComponent obj)
     throws Exception
   {
@@ -1797,117 +1806,13 @@ public class Server
     }
   }
   
-  /* Error */
+  /* TODO */
   public com.bloom.historicalcache.Cache createCache(MetaInfo.Cache targetInfo)
     throws Exception
   {
-    // Byte code:
-    //   0: aload_0
-    //   1: getfield 621	com/bloom/runtime/Server:openObjects	Ljava/util/Map;
-    //   4: dup
-    //   5: astore_2
-    //   6: monitorenter
-    //   7: aconst_null
-    //   8: astore_3
-    //   9: aload_0
-    //   10: aload_1
-    //   11: getfield 646	com/bloom/runtime/meta/MetaInfo$Cache:typename	Lcom/bloom/uuid/UUID;
-    //   14: invokevirtual 216	com/bloom/runtime/Server:getObject	(Lcom/bloom/uuid/UUID;)Lcom/bloom/runtime/meta/MetaInfo$MetaObject;
-    //   17: checkcast 565	com/bloom/runtime/meta/MetaInfo$Type
-    //   20: astore 4
-    //   22: aload_1
-    //   23: getfield 647	com/bloom/runtime/meta/MetaInfo$Cache:reader_properties	Ljava/util/Map;
-    //   26: ldc_w 648
-    //   29: aload 4
-    //   31: getfield 649	com/bloom/runtime/meta/MetaInfo$Type:className	Ljava/lang/String;
-    //   34: invokeinterface 277 3 0
-    //   39: pop
-    //   40: aload_1
-    //   41: getfield 650	com/bloom/runtime/meta/MetaInfo$Cache:adapterClassName	Ljava/lang/String;
-    //   44: ifnull +41 -> 85
-    //   47: invokestatic 440	com/bloom/classloading/WALoader:get	()Lcom/bloom/classloading/WALoader;
-    //   50: aload_1
-    //   51: getfield 650	com/bloom/runtime/meta/MetaInfo$Cache:adapterClassName	Ljava/lang/String;
-    //   54: invokevirtual 637	com/bloom/classloading/WALoader:loadClass	(Ljava/lang/String;)Ljava/lang/Class;
-    //   57: astore 5
-    //   59: aload_1
-    //   60: getfield 647	com/bloom/runtime/meta/MetaInfo$Cache:reader_properties	Ljava/util/Map;
-    //   63: ldc_w 651
-    //   66: iconst_1
-    //   67: invokestatic 652	java/lang/Boolean:valueOf	(Z)Ljava/lang/Boolean;
-    //   70: invokeinterface 277 3 0
-    //   75: pop
-    //   76: aload 5
-    //   78: invokevirtual 638	java/lang/Class:newInstance	()Ljava/lang/Object;
-    //   81: checkcast 639	com/bloom/proc/BaseProcess
-    //   84: astore_3
-    //   85: new 653	com/bloom/historicalcache/Cache
-    //   88: dup
-    //   89: aload_1
-    //   90: aload_0
-    //   91: aload_3
-    //   92: invokespecial 654	com/bloom/historicalcache/Cache:<init>	(Lcom/bloom/runtime/meta/MetaInfo$Cache;Lcom/bloom/runtime/BaseServer;Lcom/bloom/proc/BaseProcess;)V
-    //   95: astore 5
-    //   97: aload_0
-    //   98: aload 5
-    //   100: invokevirtual 603	com/bloom/runtime/Server:putOpenObject	(Lcom/bloom/runtime/components/FlowComponent;)V
-    //   103: aload 5
-    //   105: aload_2
-    //   106: monitorexit
-    //   107: areturn
-    //   108: astore 6
-    //   110: aload_2
-    //   111: monitorexit
-    //   112: aload 6
-    //   114: athrow
-    //   115: astore_2
-    //   116: new 360	com/bloom/exception/ServerException
-    //   119: dup
-    //   120: new 49	java/lang/StringBuilder
-    //   123: dup
-    //   124: invokespecial 50	java/lang/StringBuilder:<init>	()V
-    //   127: ldc_w 644
-    //   130: invokevirtual 52	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   133: aload_1
-    //   134: getfield 650	com/bloom/runtime/meta/MetaInfo$Cache:adapterClassName	Ljava/lang/String;
-    //   137: invokevirtual 52	java/lang/StringBuilder:append	(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    //   140: invokevirtual 57	java/lang/StringBuilder:toString	()Ljava/lang/String;
-    //   143: aload_2
-    //   144: invokespecial 645	com/bloom/exception/ServerException:<init>	(Ljava/lang/String;Ljava/lang/Throwable;)V
-    //   147: athrow
-    // Line number table:
-    //   Java source line #1874	-> byte code offset #0
-    //   Java source line #1876	-> byte code offset #7
-    //   Java source line #1882	-> byte code offset #9
-    //   Java source line #1883	-> byte code offset #22
-    //   Java source line #1884	-> byte code offset #40
-    //   Java source line #1885	-> byte code offset #47
-    //   Java source line #1887	-> byte code offset #59
-    //   Java source line #1888	-> byte code offset #76
-    //   Java source line #1890	-> byte code offset #85
-    //   Java source line #1891	-> byte code offset #97
-    //   Java source line #1893	-> byte code offset #103
-    //   Java source line #1894	-> byte code offset #108
-    //   Java source line #1895	-> byte code offset #115
-    //   Java source line #1896	-> byte code offset #116
-    // Local variable table:
-    //   start	length	slot	name	signature
-    //   0	148	0	this	Server
-    //   0	148	1	targetInfo	MetaInfo.Cache
-    //   115	29	2	e	ClassNotFoundException
-    //   8	84	3	bp	BaseProcess
-    //   20	10	4	t	MetaInfo.Type
-    //   57	20	5	adapterFactory	Class<?>
-    //   95	9	5	cache	com.bloom.historicalcache.Cache
-    //   108	5	6	localObject1	Object
-    // Exception table:
-    //   from	to	target	type
-    //   7	107	108	finally
-    //   108	112	108	finally
-    //   0	107	115	java/lang/ClassNotFoundException
-    //   108	115	115	java/lang/ClassNotFoundException
+    
   }
-  
+  // 数据流生成器
   public IStreamGenerator createStreamGen(MetaInfo.StreamGenerator g)
     throws Exception
   {
@@ -1931,7 +1836,7 @@ public class Server
       }
     }
   }
-  
+  // 在对象中获得数据流
   private void getStreamsInObject(UUID id, Map<UUID, MetaInfo.Stream> result)
     throws Exception
   {
@@ -1993,12 +1898,12 @@ public class Server
       logger.info("shutdown finished");
     }
   }
-  
+  // 获得分布式信道
   public ZMQChannel getDistributedChannel(Stream owner)
   {
     return new ZMQChannel(this, owner);
   }
-  
+  // 创建元数据信息流
   public Flow createFlow(MetaInfo.Flow flowInfo, Flow parent)
     throws Exception
   {
@@ -2015,7 +1920,7 @@ public class Server
     putOpenObject(flow);
     return flow;
   }
-  
+  // 创建数据源
   public Source createSource(MetaInfo.Source sourceInfo)
     throws Exception
   {
@@ -2049,7 +1954,7 @@ public class Server
   QueryValidator qv = null;
   public static volatile Server server;
   private static volatile WebServer webServer;
-  
+  // 对象的远程调用
   public void remoteCallOnObject(ActionType what, MetaInfo.MetaObject obj, Object[] params, UUID clientSessionID)
     throws Exception
   {
@@ -2170,15 +2075,13 @@ public class Server
         stopUndeployQuery(info, clientSessionID, what);
         break;
       default: 
-        if (!$assertionsDisabled) {
-          throw new AssertionError();
-        }
+        
         break;
       }
     }
     catch (Throwable e)
     {
-      throw e;
+       e.printStackTrace();
     }
   }
   
@@ -2249,7 +2152,7 @@ public class Server
       }
       else
       {
-        HashMap<UUID, Pair<Publisher, Subscriber>> newUserRecord = new HashMap();
+        HashMap<UUID, Pair> newUserRecord = new HashMap();
         newUserRecord.put(info.uuid, Pair.make(outputStream, adhocStreamSubscriber));
         this.userQueryRecords.put(clientSessionID, newUserRecord);
       }
@@ -2347,7 +2250,6 @@ public class Server
     {
       logger.error("Deploy for flow: " + info.name + "(uuid: " + info.uuid + ") failed with exception " + e.getMessage(), e);
       removeDeployedObject(f);
-      throw e;
     }
     List<MetaInfo.MetaObjectInfo> deployed = null;
     if (getOpenObject(info.uuid) != null) {
@@ -2463,7 +2365,7 @@ public class Server
           }
         }
         List<WactionStore> allWactionStores = flow.getAllWactionStores();
-        Object failWactionStores = new Stack();
+        Stack failWactionStores = new Stack();
         for (WactionStore ws : allWactionStores) {
           try
           {
@@ -2490,8 +2392,9 @@ public class Server
         if (!((Stack)failWactionStores).isEmpty())
         {
           StringBuilder names = new StringBuilder("Failed to clear WactionStore checkpoint for: ");
-          for (WactionStore ws : (Stack)failWactionStores) {
-            names.append(ws.getMetaName()).append(" ");
+          for (Iterator iter =  failWactionStores.iterator(); iter.hasNext();) {
+        	  WactionStore ws = (WactionStore)iter.next(); 
+        	  names.append(ws.getMetaName()).append(" ");
           }
           throw new Exception(names.toString());
         }
