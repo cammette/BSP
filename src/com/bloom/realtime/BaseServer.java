@@ -5,6 +5,7 @@ import com.hazelcast.core.Endpoint;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ISemaphore;
 import com.hazelcast.core.Member;
+import com.bloom.distribution.WAQueue;
 import com.bloom.distribution.WAQueue.Listener;
 import com.bloom.exception.ServerException;
 import com.bloom.exceptionhandling.WAExceptionMgr;
@@ -33,7 +34,6 @@ import com.bloom.runtime.meta.MetaInfo;
 import com.bloom.runtime.meta.MetaInfo.DeploymentGroup;
 import com.bloom.runtime.meta.MetaInfo.Initializer;
 import com.bloom.runtime.meta.MetaInfo.MetaObject;
-import com.bloom.runtime.meta.MetaInfo.Server;
 import com.bloom.runtime.meta.MetaInfo.Type;
 import com.bloom.runtime.monitor.MonitorApp;
 import com.bloom.runtime.monitor.MonitorEvent;
@@ -81,24 +81,40 @@ import org.jctools.queues.MpscCompoundQueue;
 public abstract class BaseServer
   implements WAQueue.Listener, ServerServices
 {
+  // 全局命名空间
   public static final String GLOBAL_NAMSPACE = "Global";
+  // 全局命名空间的 UUID
   public static final UUID GLOBAL_NAMSPACE_UUID = new UUID("9A315652-1204-6E32-9105-AEC16CC6AD49");
+  // 监控源应用
   public static final String MONITORING_SOURCE_APP = "MonitoringSourceApp";
+  // 监控源数据流
   public static final String MONITORING_SOURCE_FLOW = "MonitoringSourceFlow";
+  // 监控源
   public static final String MONITORING_SOURCE = "MonitoringSource1";
+  // 监控处理应用
   public static final String MONITORING_PROCESS_APP = "MonitoringProcessApp";
+  // 服务器名称
   private static String serverName = "__server";
+  // 设置管理
   public static final String ADMIN = "admin";
   private static Logger logger = Logger.getLogger(BaseServer.class);
+  // 服务器启动时间
   public static final long startupTimeStamp = System.currentTimeMillis();
+  // 元数据 DB 提供者
   public static MetaDataDbProvider metaDataDbProvider;
+  // 调度器
   private final ScheduledThreadPoolExecutor scheduler;
   public final Map<UUID, FlowComponent> openObjects;
+  // 消息系统
   public MessagingSystem messagingSystem;
+  // 异常管理器
   public WAExceptionMgr exception_manager;
+  // 元数据容器
   public MDRepository metadataRepository;
+  // 显示数据处理流
   private Stream showStream;
   public static volatile BaseServer baseServer;
+  // 异常数据流
   private Stream exceptionStream;
   
   public static class LogAndDiscardPolicy
@@ -122,7 +138,7 @@ public abstract class BaseServer
   {
     return baseServer;
   }
-  
+  // 设置元数据容器的相关信息, 获得保存数据库元数据的容器
   public static MetaDataDbProvider setMetaDataDbProviderDetails()
   {
     String dataBaseName = System.getProperty("com.bloom.config.metaDataRepositoryDB");
@@ -137,11 +153,11 @@ public abstract class BaseServer
   {
     return metaDataDbProvider;
   }
-  
+  // 初始化元数据
   public void initializeMetaData()
   {
     this.metadataRepository = MetadataRepository.getINSTANCE();
-    
+    // 首先选择一个候选服务器
     String candidateServerName = null;
     try
     {
@@ -154,17 +170,17 @@ public abstract class BaseServer
     }
     serverName = candidateServerName;
   }
-  
+  // 初始化消息系统, 默认为ZeroMQ
   public void initializeMessaging()
   {
     this.messagingSystem = MessagingProvider.getMessagingSystem("com.bloom.jmqmessaging.ZMQSystem");
   }
-  
+  // 获得消息系统
   public MessagingSystem getMessagingSystem()
   {
     return this.messagingSystem;
   }
-  
+  // 获得异常数据流
   public Stream getExceptionStream()
     throws Exception
   {
@@ -181,6 +197,7 @@ public abstract class BaseServer
   {
     MetaInfo.Type type = null;
     String typeName = "Global." + clazz.getSimpleName();
+    // 通过类型名称得到元信息的对象
     try
     {
       type = (MetaInfo.Type)this.metadataRepository.getMetaObjectByName(EntityType.TYPE, "Global", clazz.getSimpleName(), null, WASecurityManager.TOKEN);
@@ -216,11 +233,11 @@ public abstract class BaseServer
         logger.info("creating exception manager");
       }
       this.exception_manager = WAExceptionMgr.get();
-      
+      // 构建异常流
       MetaInfo.Type dataType = getTypeForCLass(ExceptionEvent.class);
       final MetaInfo.Stream streamMetaObj = new MetaInfo.Stream();
       streamMetaObj.construct("exceptionsStream", WAExceptionMgr.ExceptionStreamUUID, MetaInfo.GlobalNamespace, dataType.uuid, null, null, null);
-      
+      // 将数据流的元对象放入到元数据的容器中
       this.metadataRepository.putMetaObject(streamMetaObj, WASecurityManager.TOKEN);
       this.exceptionStream = ((Stream)putOpenObjectIfNotExists(streamMetaObj.uuid, new StreamObjectFac()
       {
@@ -231,6 +248,7 @@ public abstract class BaseServer
           return s;
         }
       }));
+      // 启动异常处理流
       this.exceptionStream.start();
       subscribe(this.exceptionStream, this.exception_manager);
       if (logger.isDebugEnabled()) {
@@ -256,7 +274,7 @@ public abstract class BaseServer
       logger.warn("Error in closing ExceptionStream : " + e.getMessage());
     }
   }
-  
+  // 初始化显示流
   public void initShowStream()
   {
     try
@@ -267,7 +285,7 @@ public abstract class BaseServer
       MetaInfo.Type dataType = getTypeForCLass(ShowStreamEvent.class);
       final MetaInfo.Stream streamMetaObj = new MetaInfo.Stream();
       streamMetaObj.construct("showStream", ShowStreamManager.ShowStreamUUID, MetaInfo.GlobalNamespace, dataType.uuid, null, null, null);
-      
+      // 放入流元对象
       this.showStream = ((Stream)putOpenObjectIfNotExists(streamMetaObj.uuid, new StreamObjectFac()
       {
         public FlowComponent create()
@@ -288,7 +306,7 @@ public abstract class BaseServer
       se.printStackTrace();
     }
   }
-  
+  // 初始化监控 App
   public void initMonitoringApp()
     throws MetaDataRepositoryException
   {
@@ -298,32 +316,32 @@ public abstract class BaseServer
     this.monitorLogger.addAppender(this.monitorAppender);
     MonitorApp.getMonitorApp();
   }
-  
+  // 通过 UUID 获得元对象
   public MetaInfo.MetaObject getMetaObject(UUID uuid)
     throws MetaDataRepositoryException
   {
     return this.metadataRepository.getMetaObjectByUUID(uuid, WASecurityManager.TOKEN);
   }
-  
+  // 获得类型信息
   public MetaInfo.Type getTypeInfo(UUID uuid)
     throws ServerException, MetaDataRepositoryException
   {
     return (MetaInfo.Type)getObjectInfo(uuid, EntityType.TYPE);
   }
-  
+  // 通过名称获得部署组
   public MetaInfo.DeploymentGroup getDeploymentGroupByName(String name)
     throws MetaDataRepositoryException
   {
     return (MetaInfo.DeploymentGroup)getObject(EntityType.DG, "Global", name);
   }
-  
+  // 放入元数据对象
   protected MetaInfo.MetaObject putObject(MetaInfo.MetaObject obj)
     throws MetaDataRepositoryException
   {
     this.metadataRepository.putMetaObject(obj, WASecurityManager.TOKEN);
     return this.metadataRepository.getMetaObjectByUUID(obj.getUuid(), WASecurityManager.TOKEN);
   }
-  
+  // 更新元数据对象
   protected MetaInfo.MetaObject updateObject(MetaInfo.MetaObject obj)
     throws MetaDataRepositoryException
   {
@@ -342,13 +360,13 @@ public abstract class BaseServer
   {
     return this.metadataRepository.getMetaObjectByUUID(uuid, WASecurityManager.TOKEN);
   }
-  
+  // 通过 ID 获得部署组
   public MetaInfo.DeploymentGroup getDeploymentGroupByID(UUID uuid)
     throws ServerException, MetaDataRepositoryException
   {
     return (MetaInfo.DeploymentGroup)getObjectInfo(uuid, EntityType.DG);
   }
-  
+  // 订阅器订阅消息
   public void subscribe(Publisher pub, Subscriber sub)
     throws Exception
   {
@@ -393,7 +411,7 @@ public abstract class BaseServer
   {
     return new SimpleChannel();
   }
-  
+  // 获得流信息
   public MetaInfo.Stream getStreamInfo(UUID uuid)
     throws ServerException, MetaDataRepositoryException
   {
@@ -404,7 +422,7 @@ public abstract class BaseServer
   {
     return this.scheduler;
   }
-  
+  //关闭调度器和消息提供器
   public void shutdown()
   {
     this.scheduler.shutdown();
@@ -413,6 +431,7 @@ public abstract class BaseServer
     {
       if (!this.scheduler.awaitTermination(5L, TimeUnit.SECONDS))
       {
+    	  	// 关闭调度器
         this.scheduler.shutdownNow();
         if (!this.scheduler.awaitTermination(60L, TimeUnit.SECONDS)) {
           System.err.println("Scheduler did not terminate");
@@ -433,12 +452,12 @@ public abstract class BaseServer
     synchronized (this.openObjects)
     {
       this.openObjects.put(id, obj);
-      
+      // 放入开放对象
       Pair pair = Pair.make(id, getServerID());
       this.metadataRepository.putDeploymentInfo(pair, WASecurityManager.TOKEN);
     }
   }
-  
+  // 将流组件放入开放对象
   protected FlowComponent putOpenObjectIfNotExists(UUID objId, StreamObjectFac fac)
     throws Exception
   {
@@ -458,42 +477,23 @@ public abstract class BaseServer
     }
   }
   
-  /* Error */
+  // 根据 UUID 获得开放对象
   public FlowComponent getOpenObject(UUID uuid)
   {
-    // Byte code:
-    //   0: aload_0
-    //   1: getfield 14	com/bloom/runtime/BaseServer:openObjects	Ljava/util/Map;
-    //   4: dup
-    //   5: astore_2
-    //   6: monitorenter
-    //   7: aload_0
-    //   8: getfield 14	com/bloom/runtime/BaseServer:openObjects	Ljava/util/Map;
-    //   11: aload_1
-    //   12: invokeinterface 154 2 0
-    //   17: checkcast 155	com/bloom/runtime/components/FlowComponent
-    //   20: aload_2
-    //   21: monitorexit
-    //   22: areturn
-    //   23: astore_3
-    //   24: aload_2
-    //   25: monitorexit
-    //   26: aload_3
-    //   27: athrow
-    // Line number table:
-    //   Java source line #410	-> byte code offset #0
-    //   Java source line #411	-> byte code offset #7
-    //   Java source line #412	-> byte code offset #23
-    // Local variable table:
-    //   start	length	slot	name	signature
-    //   0	28	0	this	BaseServer
-    //   0	28	1	uuid	UUID
-    //   5	20	2	Ljava/lang/Object;	Object
-    //   23	4	3	localObject1	Object
-    // Exception table:
-    //   from	to	target	type
-    //   7	22	23	finally
-    //   23	26	23	finally
+	  
+	  FlowComponent flowComponent;
+	try {
+		flowComponent = this.openObjects.get(uuid);
+	} catch (Exception e) {
+		e.printStackTrace();
+	} finally{
+		if (logger.isInfoEnabled()) {
+	        logger.info("Opened " + flowComponent.toString());
+	      }
+	}
+	      
+	    
+	  return flowComponent;
   }
   
   protected void closeOpenObject(FlowComponent object)
@@ -520,7 +520,7 @@ public abstract class BaseServer
   Long prevCpuTime = null;
   private Logger monitorLogger;
   private MonitorLogAppender monitorAppender;
-  
+  // 获得监控器事件
   public Collection<MonitorEvent> getMonitorEvents(long ts)
   {
     Collection<MonitorEvent> monEvs = new ArrayList();
@@ -528,11 +528,11 @@ public abstract class BaseServer
     UUID serverID = getServerID();
     UUID entityID = serverID;
     long timeStamp = ts;
-    
+    // 总内存, 最大内存, 剩余内存
     long totalMemory = Runtime.getRuntime().totalMemory();
     long maxMemory = Runtime.getRuntime().maxMemory();
     long freeMemory = maxMemory - (totalMemory - Runtime.getRuntime().freeMemory());
-    
+    // 添加监控器事件
     monEvs.add(new MonitorEvent(serverID, entityID, MonitorEvent.Type.UPTIME, Long.valueOf(timeStamp - startupTimeStamp), Long.valueOf(timeStamp)));
     monEvs.add(new MonitorEvent(serverID, entityID, MonitorEvent.Type.MEMORY_TOTAL, Long.valueOf(totalMemory), Long.valueOf(timeStamp)));
     monEvs.add(new MonitorEvent(serverID, entityID, MonitorEvent.Type.MEMORY_MAX, Long.valueOf(maxMemory), Long.valueOf(timeStamp)));
@@ -645,7 +645,7 @@ public abstract class BaseServer
       MonitorEvent.Type logType;
       if (monLoggingEvent.getLevel().toInt() >= Level.ERROR.toInt())
       {
-        MonitorEvent.Type logType = MonitorEvent.Type.LOG_ERROR;
+        logType = MonitorEvent.Type.LOG_ERROR;
         numLogErrors += 1L;
       }
       else
@@ -705,7 +705,7 @@ public abstract class BaseServer
       return false;
     }
   }
-  
+  // 生成服务器名称
   private static String generateServerName()
     throws Exception
   {
@@ -738,7 +738,8 @@ public abstract class BaseServer
       sb.append(serverOrAgent);
       sb.append(address);
       String group;
-      for (group : groups) {
+      for (int i=0; i< groups.length; i++) {
+    	  	group = groups[i];
         if (!group.equalsIgnoreCase("default"))
         {
           sb.append("_");
@@ -764,7 +765,7 @@ public abstract class BaseServer
       lock.release();
     }
   }
-  
+  // 查看服务器名称是否正在使用
   public static boolean serverNameIsInUse(HazelcastInstance hz, String serverName)
   {
     Set<Member> allServersAndAgents = hz.getCluster().getMembers();
@@ -790,12 +791,12 @@ public abstract class BaseServer
   {
     return serverName;
   }
-  
+  // 创建广播的管道
   public Channel createChannel(FlowComponent owner)
   {
     return new BroadcastAsyncChannel(owner);
   }
-  
+  // 获得所有对象的视图
   public abstract Collection<FlowComponent> getAllObjectsView();
   
   public abstract Collection<Channel> getAllChannelsView();
@@ -813,6 +814,6 @@ public abstract class BaseServer
   
   public abstract <T extends MetaInfo.MetaObject> T getObjectInfo(UUID paramUUID, EntityType paramEntityType)
     throws ServerException, MetaDataRepositoryException;
-  
+  // 获得分布式分发消息的管道, 为ZMQChannel
   public abstract ZMQChannel getDistributedChannel(Stream paramStream);
 }
