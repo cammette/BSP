@@ -30,13 +30,13 @@ public abstract class Batch<T>
     return size() == 0;
   }
   
-  public T first()
+  public Iterable first()
   {
-    Iterable<T> it = this;
+    Iterable it = this;
     java.util.Iterator i$ = it.iterator();
     if (i$.hasNext())
     {
-      T e = i$.next();
+    	Iterable e = (Iterable)i$.next();
       return e;
     }
     return null;
@@ -87,17 +87,17 @@ public abstract class Batch<T>
     return emptyBatch;
   }
   
-  public static Batch asBatch(HashMap<RecordKey, WAEvent> b)
+  public static Batch asBatch(final HashMap<RecordKey, WAEvent> b)
   {
-    new Batch()
+    return new Batch()
     {
       private static final long serialVersionUID = 4242550963548968535L;
       
       public java.util.Iterator<WAEvent> iterator()
       {
-        new java.util.Iterator()
+        return new java.util.Iterator()
         {
-          scala.collection.Iterator<Tuple2<RecordKey, WAEvent>> it = Batch.2.this.val$b.iterator();
+          scala.collection.Iterator<Tuple2<RecordKey, WAEvent>> it = b.iterator();
           
           public boolean hasNext()
           {
@@ -118,7 +118,7 @@ public abstract class Batch<T>
       
       public int size()
       {
-        return this.val$b.size();
+        return b.size();
       }
     };
   }
@@ -177,15 +177,15 @@ public abstract class Batch<T>
     return new StreamColBatch(col);
   }
   
-  public static Batch asBatch(WAEvent e)
+  public static Batch asBatch(final WAEvent e)
   {
-    new Batch()
+    return new Batch()
     {
       private static final long serialVersionUID = 7274470955311509658L;
       
       public java.util.Iterator<WAEvent> iterator()
       {
-        new java.util.Iterator()
+        return new java.util.Iterator()
         {
           private boolean hasNext = true;
           
@@ -199,7 +199,7 @@ public abstract class Batch<T>
             if (this.hasNext)
             {
               this.hasNext = false;
-              return Batch.3.this.val$e;
+              return e;
             }
             throw new NoSuchElementException();
           }
@@ -218,17 +218,17 @@ public abstract class Batch<T>
     };
   }
   
-  public static Batch batchesAsBatch(Collection<IBatch> col)
+  public static Batch batchesAsBatch(final Collection<IBatch> col)
   {
-    new Batch()
+    return new Batch()
     {
       private static final long serialVersionUID = -1796558864997411339L;
       
       public java.util.Iterator<WAEvent> iterator()
       {
-        new java.util.Iterator()
+        return new java.util.Iterator()
         {
-          private java.util.Iterator<IBatch> sit = Batch.4.this.val$col.iterator();
+          private java.util.Iterator<IBatch> sit = col.iterator();
           private java.util.Iterator<WAEvent> it = Collections.emptyIterator();
           private WAEvent _next = null;
           
@@ -239,13 +239,13 @@ public abstract class Batch<T>
               while (!this.it.hasNext())
               {
                 if (!this.sit.hasNext()) {
-                  break label77;
+                  break ;
                 }
                 this.it = ((IBatch)this.sit.next()).iterator();
               }
               this._next = ((WAEvent)this.it.next());
             }
-            label77:
+            
             return this._next;
           }
           
@@ -271,7 +271,7 @@ public abstract class Batch<T>
       public int size()
       {
         int size = 0;
-        for (IBatch b : this.val$col) {
+        for (IBatch b : col) {
           size += b.size();
         }
         return size;
@@ -279,8 +279,8 @@ public abstract class Batch<T>
       
       public boolean isEmpty()
       {
-        if (!this.val$col.isEmpty()) {
-          for (IBatch b : this.val$col) {
+        if (!col.isEmpty()) {
+          for (IBatch b : col) {
             if (!b.isEmpty()) {
               return false;
             }
@@ -291,17 +291,17 @@ public abstract class Batch<T>
     };
   }
   
-  public static Batch asBatch(Queue<WAEvent> buf)
+  public static Batch asBatch(final Queue<WAEvent> buf)
   {
-    new Batch()
+    return new Batch()
     {
       private static final long serialVersionUID = 4716758572600013367L;
       
       public java.util.Iterator<WAEvent> iterator()
       {
-        new java.util.Iterator()
+        return new java.util.Iterator()
         {
-          private scala.collection.Iterator<WAEvent> it = Batch.5.this.val$buf.iterator();
+          private scala.collection.Iterator<WAEvent> it = buf.iterator();
           
           public boolean hasNext()
           {
@@ -322,7 +322,7 @@ public abstract class Batch<T>
       
       public int size()
       {
-        return this.val$buf.size();
+        return buf.size();
       }
     };
   }

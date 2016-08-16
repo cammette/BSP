@@ -108,7 +108,7 @@ public final class Utility
         }
         catch (Throwable localThrowable1)
         {
-          localThrowable2 = localThrowable1;throw localThrowable1;
+          localThrowable2 = localThrowable1;
         }
         finally
         {

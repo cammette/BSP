@@ -19,14 +19,14 @@ abstract class WBuffer
     this.key = key;
   }
   
-  final void publish(List<WAEvent> added, List<WAEvent> removed)
+  final void publish(List added, List removed)
     throws Exception
   {
     Range snapshot = makeSnapshot();
     this.owner.publish(Batch.asBatch(added), removed, snapshot);
   }
   
-  final void publish(Batch added, List<WAEvent> removed)
+  final void publish(Batch added, List removed)
     throws Exception
   {
     Range snapshot = makeSnapshot();

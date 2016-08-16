@@ -23,6 +23,7 @@ import com.bloom.runtime.meta.MetaInfo.MetaObject;
 import com.bloom.runtime.meta.MetaInfo.Type;
 import com.bloom.runtime.meta.MetaInfo.WActionStore;
 import com.bloom.runtime.meta.MetaInfoStatus;
+import com.bloom.runtime.monitor.MonitorEvent;
 import com.bloom.runtime.monitor.MonitorEventsCollection;
 import com.bloom.waction.Waction;
 import com.bloom.waction.WactionKey;
@@ -152,14 +153,12 @@ public class WAStoreView
     try
     {
       Range r;
-      Range r;
       if (this.timerLimit == 0L)
       {
         r = queryAllStore();
       }
       else
       {
-        Range r;
         if (!this.viewMetaInfo.isJumping.booleanValue())
         {
           long end = System.currentTimeMillis();
@@ -222,7 +221,7 @@ public class WAStoreView
   
   private Range executeQueryOldStyle(final long startTime, long endTime)
   {
-    new Range()
+    return new Range()
     {
       private static final long serialVersionUID = -4805866185978952939L;
       private transient List<WAEvent> values;
@@ -251,7 +250,7 @@ public class WAStoreView
       {
         new Iterator()
         {
-          Iterator<Waction> it = WAStoreView.2.this.val$res.iterator();
+          Iterator<Waction> it = res.iterator();
           
           public boolean hasNext()
           {
@@ -387,20 +386,20 @@ public class WAStoreView
   
   private Range makeSnapshot(final Iterable<WAction> rs)
   {
-    new Range()
+    return new Range()
     {
       private static final long serialVersionUID = 8193566130544575344L;
       
       public Batch all()
       {
-        new Batch()
+        return new Batch()
         {
           private static final long serialVersionUID = -6673129930236624672L;
           
           public Iterator<WAEvent> iterator()
           {
-            final Iterator<WAction> it = WAStoreView.3.this.val$rs.iterator();
-            new Iterator()
+            final Iterator<WAction> it = rs.iterator();
+            return new Iterator()
             {
               public boolean hasNext()
               {
@@ -422,7 +421,7 @@ public class WAStoreView
           public int size()
           {
             int count = 0;
-            for (WAction a : WAStoreView.3.this.val$rs) {
+            for (WAction a : rs) {
               count++;
             }
             return count;

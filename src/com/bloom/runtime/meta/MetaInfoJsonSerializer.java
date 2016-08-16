@@ -137,7 +137,7 @@ public class MetaInfoJsonSerializer
         metaObject.bindParameters.addAll(bindParameters);
       }
       List qp = (List)results.get("projectionFields");
-      metaObject.projectionFields.addAll(QueryManager.QueryProjection.jsonDeserializer(qp));
+      metaObject.projectionFields.addAll(QueryProjection.jsonDeserializer(qp));
       return metaObject;
     }
   }

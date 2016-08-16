@@ -11,13 +11,13 @@ import java.util.Map.Entry;
 import scala.Option;
 import scala.Tuple2;
 import scala.collection.Iterator;
-import scala.collection.immutable.HashMap;
+import scala.collection.immutable.HashMap$;
 
 class PartitionedBufferPolicy
   implements WBufferPolicy
 {
   final KeyFactory keyFactory;
-  scala.collection.immutable.HashMap<RecordKey, WBuffer> buffers = HashMap.MODULE$.empty();
+  scala.collection.immutable.HashMap<RecordKey, WBuffer> buffers = HashMap$.MODULE$.empty();
   
   PartitionedBufferPolicy(KeyFactory kf)
     throws Exception
@@ -56,7 +56,7 @@ class PartitionedBufferPolicy
   
   public void initBuffer(ScalaWindow w)
   {
-    this.buffers = HashMap.MODULE$.empty();
+    this.buffers = HashMap$.MODULE$.empty();
   }
   
   public void onJumpingTimer()

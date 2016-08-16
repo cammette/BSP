@@ -450,23 +450,27 @@ public class MonitorModel
         appUUIDs = new LinkedHashMap();
         for (Map.Entry<EntityType, LinkedHashSet<UUID>> appList : appE.entrySet())
         {
-          for (UUID uuid : (LinkedHashSet)appList.getValue())
+          for (Iterator iter =  ((LinkedHashSet)appList.getValue()).iterator(); iter.hasNext();)
           {
+        	  	UUID uuid = (UUID)iter.next();
             MetaInfo.MetaObject subObj = MetadataRepository.getINSTANCE().getMetaObjectByUUID(uuid, WASecurityManager.TOKEN);
             if (subObj != null) {
               appUUIDs.put(uuid, subObj.nsName + "." + subObj.name);
             }
           }
           if (((EntityType)appList.getKey()).equals(EntityType.FLOW)) {
-            for (UUID flowUUID : (LinkedHashSet)appList.getValue())
+            for (Iterator iter =  ((LinkedHashSet)appList.getValue()).iterator(); iter.hasNext();)
             {
+            	
+            	UUID flowUUID = (UUID)iter.next();
               MetaInfo.Flow flow = (MetaInfo.Flow)MetadataRepository.getINSTANCE().getMetaObjectByUUID(flowUUID, WASecurityManager.TOKEN);
               if (flow != null)
               {
                 Map<EntityType, LinkedHashSet<UUID>> flowE = flow.getObjects();
                 for (Map.Entry<EntityType, LinkedHashSet<UUID>> flowList : flowE.entrySet()) {
-                  for (UUID uuid : (LinkedHashSet)flowList.getValue())
+                  for (Iterator iter1 =  ((LinkedHashSet)flowList.getValue()).iterator(); iter.hasNext();)
                   {
+                	  	UUID uuid = (UUID)iter1.next();
                     MetaInfo.MetaObject subObj = MetadataRepository.getINSTANCE().getMetaObjectByUUID(uuid, WASecurityManager.TOKEN);
                     if (subObj != null) {
                       appUUIDs.put(uuid, subObj.nsName + "." + subObj.name);
@@ -510,10 +514,9 @@ public class MonitorModel
       return componentRollupEvents;
     }
     Set<MonitorData.Key> keysToGet = new HashSet();
-    MonitorEvent monEvent;
     for (Iterator i$ = rawEvents.iterator(); i$.hasNext();)
     {
-      monEvent = (MonitorEvent)i$.next();
+    	MonitorEvent monEvent = (MonitorEvent)i$.next();
       for (UUID serverID : allServers.keySet()) {
         if (!monEvent.serverID.equals(serverID)) {
           keysToGet.add(new MonitorData.Key(monEvent.entityID, serverID));
@@ -735,8 +738,9 @@ public class MonitorModel
     for (Map.Entry<UUID, Map<MonitorEvent.Type, Object>> appEntry : currentAppValues.entrySet())
     {
       appId = (UUID)appEntry.getKey();
-      for (Map.Entry<MonitorEvent.Type, Object> eventEntry : ((Map)appEntry.getValue()).entrySet())
+      for (Iterator iterator = ((Map)appEntry.getValue()).entrySet().iterator();iterator.hasNext();)
       {
+    	  Map.Entry<MonitorEvent.Type, Object> eventEntry = (Map.Entry<MonitorEvent.Type, Object>)iterator.next();
         MonitorEvent appEvent = new MonitorEvent(serverID, appId, (MonitorEvent.Type)eventEntry.getKey(), Long.valueOf(0L), ts);
         Object value = eventEntry.getValue();
         appEvent.valueLong = ((value instanceof Long) ? (Long)value : null);
@@ -1442,8 +1446,9 @@ public class MonitorModel
         numComps = 0;
         for (Map.Entry<EntityType, LinkedHashSet<UUID>> entry : flow.objects.entrySet()) {
           if (((EntityType)entry.getKey()).equals(EntityType.FLOW)) {
-            for (UUID subUUID : (LinkedHashSet)entry.getValue())
+            for (Iterator iter =  ((LinkedHashSet)entry.getValue()).iterator(); iter.hasNext();)
             {
+            	UUID subUUID = (UUID)iter.next();
               MetaInfo.Flow subFlow = (MetaInfo.Flow)MetadataRepository.getINSTANCE().getMetaObjectByUUID(subUUID, WASecurityManager.TOKEN);
               if (subFlow != null) {
                 for (Map.Entry<EntityType, LinkedHashSet<UUID>> subEntry : subFlow.objects.entrySet()) {
@@ -1475,8 +1480,9 @@ public class MonitorModel
         {
           List<Pair<Long, Object>> cpuRates = new ArrayList();
           List<Pair<Long, Object>> cpuRatesPerNode = new ArrayList();
-          for (Pair<Long, Object> rawCpu : (List)entry.getValue())
+          for (Iterator iter = ((List)entry.getValue()).iterator(); iter.hasNext();)
           {
+        	  	Pair<Long, Object> rawCpu = (Pair<Long, Object>)iter.next(); 
             String cpuPercentString = renderCpuPercent(((Long)rawCpu.second).longValue());
             String cpuPerNodePercentString = renderCpuPerNodePercent(((Long)rawCpu.second).longValue(), Runtime.getRuntime().availableProcessors());
             
@@ -1527,23 +1533,26 @@ public class MonitorModel
     if (!appE.isEmpty()) {
       for (Map.Entry<EntityType, LinkedHashSet<UUID>> appList : appE.entrySet())
       {
-        for (UUID uuid : (LinkedHashSet)appList.getValue())
+        for (Iterator iter =  ((LinkedHashSet)appList.getValue()).iterator();iter.hasNext();)
         {
+        	  UUID uuid = (UUID)iter.next();
           MetaInfo.MetaObject subObj = MetadataRepository.getINSTANCE().getMetaObjectByUUID(uuid, WASecurityManager.TOKEN);
           if (subObj != null) {
             addComponentResults(result, servers, subObj, serverId, timeSeriesFields, statsFields, datumNames, startTime, endTime);
           }
         }
         if (((EntityType)appList.getKey()).equals(EntityType.FLOW)) {
-          for (UUID flowUUID : (LinkedHashSet)appList.getValue())
+          for (Iterator iter =  ((LinkedHashSet)appList.getValue()).iterator();iter.hasNext();)
           {
+        	  	UUID flowUUID = (UUID)iter.next();
             MetaInfo.Flow flow = (MetaInfo.Flow)MetadataRepository.getINSTANCE().getMetaObjectByUUID(flowUUID, WASecurityManager.TOKEN);
             if (flow != null)
             {
               Map<EntityType, LinkedHashSet<UUID>> flowE = flow.getObjects();
               for (Map.Entry<EntityType, LinkedHashSet<UUID>> flowList : flowE.entrySet()) {
-                for (UUID uuid : (LinkedHashSet)flowList.getValue())
+                for (Iterator iter1 =  ((LinkedHashSet)flowList.getValue()).iterator();iter1.hasNext();)
                 {
+                	 UUID uuid = (UUID)iter1.next();
                   MetaInfo.MetaObject subObj = MetadataRepository.getINSTANCE().getMetaObjectByUUID(uuid, WASecurityManager.TOKEN);
                   if (subObj != null) {
                     addComponentResults(result, servers, subObj, serverId, timeSeriesFields, statsFields, datumNames, startTime, endTime);

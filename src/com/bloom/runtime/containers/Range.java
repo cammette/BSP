@@ -2,6 +2,7 @@ package com.bloom.runtime.containers;
 
 import com.bloom.historicalcache.Cache;
 import com.bloom.metaRepository.HazelcastSingleton;
+import com.bloom.runtime.NodeStartUp;
 import com.bloom.runtime.NodeStartUp.InitializerParams.Params;
 import com.hazelcast.core.HazelcastInstance;
 import com.bloom.runtime.RecordKey;
@@ -75,9 +76,9 @@ public abstract class Range
     return emptyRange;
   }
   
-  public static Range createRange(Cache cache)
+  public static Range createRange(final Cache cache)
   {
-    new Range()
+    return new Range()
     {
       private static final long serialVersionUID = -3860895434812640102L;
       private final long TRANSACTION_CLOSED_ID = -1L;
@@ -87,28 +88,28 @@ public abstract class Range
       public IBatch all()
       {
         if (Range.logger.isDebugEnabled()) {
-          Range.logger.debug("Get all() for cache " + this.val$cache.getMetaFullName() + " " + this.transactionId);
+          Range.logger.debug("Get all() for cache " + cache.getMetaFullName() + " " + this.transactionId);
         }
-        return this.val$cache.get(Long.valueOf(this.transactionId));
+        return cache.get(Long.valueOf(this.transactionId));
       }
       
       public IBatch lookup(int indexID, RecordKey key)
       {
         if (Range.logger.isDebugEnabled()) {
-          Range.logger.debug("Get lookup(K) for cache " + this.val$cache.getMetaFullName() + " " + this.transactionId);
+          Range.logger.debug("Get lookup(K) for cache " + cache.getMetaFullName() + " " + this.transactionId);
         }
-        return this.val$cache.get(key, Long.valueOf(this.transactionId));
+        return cache.get(key, Long.valueOf(this.transactionId));
       }
       
       public String toString()
       {
-        return "(cache range ->" + this.val$cache + ") with transactionId id " + this.transactionId;
+        return "(cache range ->" + cache + ") with transactionId id " + this.transactionId;
       }
       
       public synchronized void beginTransaction()
       {
         if (this.transactionId == -1L) {
-          this.transactionId = this.val$cache.beginTransaction();
+          this.transactionId = cache.beginTransaction();
         }
         this.transactionCount = Long.valueOf(this.transactionCount.longValue() + 1L);
       }
@@ -121,7 +122,7 @@ public abstract class Range
         this.transactionCount = Long.valueOf(this.transactionCount.longValue() - 1L);
         if (this.transactionCount.longValue() == 0L)
         {
-          this.val$cache.endTransaction(this.transactionId);
+          cache.endTransaction(this.transactionId);
           this.transactionId = -1L;
         }
       }
@@ -130,7 +131,7 @@ public abstract class Range
   
   public static Range createRange(RecordKey key, final Collection<WAEvent> buf)
   {
-    new SubRange(key)
+    return new SubRange(key)
     {
       private static final long serialVersionUID = 8217289990303717304L;
       
@@ -148,7 +149,7 @@ public abstract class Range
   
   public static Range createRange(RecordKey key, final Queue<WAEvent> buf)
   {
-    new SubRange(key)
+    return new SubRange(key)
     {
       private static final long serialVersionUID = 5437575933413950070L;
       
@@ -164,20 +165,20 @@ public abstract class Range
     };
   }
   
-  public static Range createRange(HashMap<RecordKey, WAEvent> map)
+  public static Range createRange(final HashMap<RecordKey, WAEvent> map)
   {
-    new Range()
+    return new Range()
     {
       private static final long serialVersionUID = 6264708067898281018L;
       
       public Batch all()
       {
-        return Batch.asBatch(this.val$map);
+        return Batch.asBatch(map);
       }
       
       public IBatch lookup(int indexID, RecordKey key)
       {
-        Option<WAEvent> ret = this.val$map.get(key);
+        Option<WAEvent> ret = map.get(key);
         if (ret.nonEmpty()) {
           return Batch.asBatch((WAEvent)ret.get());
         }
@@ -186,25 +187,25 @@ public abstract class Range
       
       public String toString()
       {
-        return "(scala map range " + this.val$map + ")";
+        return "(scala map range " + map + ")";
       }
     };
   }
   
-  public static IRange createRange(Map<RecordKey, IBatch> map)
+  public static IRange createRange(final Map<RecordKey, IBatch> map)
   {
-    new Range()
+    return new Range()
     {
       private static final long serialVersionUID = -5114607566419634291L;
       
       public Batch all()
       {
-        return Batch.batchesAsBatch(this.val$map.values());
+        return Batch.batchesAsBatch(map.values());
       }
       
       public IBatch lookup(int indexID, RecordKey key)
       {
-        IBatch sn = (IBatch)this.val$map.get(key);
+        IBatch sn = (IBatch)map.get(key);
         if (sn != null) {
           return sn;
         }
@@ -216,7 +217,7 @@ public abstract class Range
         if ((r instanceof Range.SubRange))
         {
           Range.SubRange sr = (Range.SubRange)r;
-          this.val$map.put(sr.key, sr.all());
+          map.put(sr.key, sr.all());
           return this;
         }
         return r;
@@ -224,7 +225,7 @@ public abstract class Range
       
       public String toString()
       {
-        return "(map of subranges " + this.val$map + ")";
+        return "(map of subranges " + map + ")";
       }
     };
   }

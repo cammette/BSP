@@ -3,6 +3,7 @@ package com.bloom.runtime.components;
 import com.bloom.runtime.BaseServer;
 import com.bloom.runtime.channels.Channel;
 import com.bloom.runtime.containers.TaskEvent;
+import com.bloom.runtime.meta.MetaInfo;
 import com.bloom.runtime.meta.MetaInfo.StreamGenerator;
 import com.bloom.runtime.monitor.MonitorEventsCollection;
 import com.bloom.uuid.UUID;

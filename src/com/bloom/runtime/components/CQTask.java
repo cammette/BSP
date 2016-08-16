@@ -20,6 +20,7 @@ import com.bloom.runtime.meta.CQExecutionPlan.DataSource;
 import com.bloom.runtime.meta.MetaInfo;
 import com.bloom.runtime.meta.MetaInfo.CQ;
 import com.bloom.runtime.meta.MetaInfo.Type;
+import com.bloom.runtime.monitor.MonitorEvent;
 import com.bloom.runtime.monitor.MonitorEventsCollection;
 import com.bloom.runtime.utils.Factory;
 import com.bloom.runtime.window.Window;
@@ -98,7 +99,7 @@ public class CQTask
       {
         private static final long serialVersionUID = 1L;
         
-        protected boolean removeEldestEntry(Map.Entry<UUID, TranslatedSchema> eldest)
+        protected boolean removeEldestEntry(Map.Entry eldest)
         {
           return size() > 2000;
         }
@@ -347,7 +348,7 @@ public class CQTask
     Object[] aggVec;
     if (val == null)
     {
-      Object[] aggVec = createNewAggVec();
+       aggVec = createNewAggVec();
       val = new AggMapEntry(aggVec);
       aggs.put(key, val);
     }
@@ -402,7 +403,7 @@ public class CQTask
     return this.indexes[index].createIterator(key);
   }
   
-  void doOutput(List<WAEvent> xnew, List<WAEvent> xold)
+  void doOutput(List<WAEvent> xnew, List xold)
   {
     dumpOutput(xnew, xold);
     if ((xnew.isEmpty()) && (xold.isEmpty())) {
@@ -461,7 +462,7 @@ public class CQTask
     }
     if (this.prevTimeStamp != null)
     {
-      Long ir = Long.valueOf(Math.ceil(1000.0D * (it.longValue() - this.prevIt.longValue()) / (timeStamp - this.prevTimeStamp.longValue())));
+      Long ir = Long.valueOf((long) Math.ceil(1000.0D * (it.longValue() - this.prevIt.longValue()) / (timeStamp - this.prevTimeStamp.longValue())));
       if (!ir.equals(this.prevInputRate))
       {
         monEvs.add(MonitorEvent.Type.INPUT_RATE, ir);
@@ -476,7 +477,7 @@ public class CQTask
     }
     if (this.prevTimeStamp != null)
     {
-      Long or = Long.valueOf(Math.ceil(1000.0D * (ot.longValue() - this.prevOt.longValue()) / (timeStamp - this.prevTimeStamp.longValue())));
+      Long or = Long.valueOf((long) Math.ceil(1000.0D * (ot.longValue() - this.prevOt.longValue()) / (timeStamp - this.prevTimeStamp.longValue())));
       if (!or.equals(this.prevOutputRate))
       {
         monEvs.add(MonitorEvent.Type.OUTPUT_RATE, or);
@@ -530,7 +531,7 @@ public class CQTask
       UUID typeID = ds.typeID;
       if (typeID != null)
       {
-        SchemaTraslator st = cache.translators[i] = new SchemaTraslator(null);
+        SchemaTraslator st = cache.translators[i] = new SchemaTraslator();
         st.originalTypeID = typeID;
         st.originalType = getTypeInfo(typeID, srv);
         st.current = createTranslatedSchema(typeID, st, srv);
@@ -783,7 +784,7 @@ public class CQTask
   
   public Iterator<SimpleEvent> makeSnapshotIterator(final int ds)
   {
-    new Iterator()
+   return new Iterator()
     {
       final Iterator<WAEvent> it = CQTask.this.state[ds].all().iterator();
       

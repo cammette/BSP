@@ -1,6 +1,7 @@
 package com.bloom.runtime.components;
 
 import com.bloom.runtime.BaseServer;
+import com.bloom.runtime.meta.MetaInfo;
 import com.bloom.runtime.meta.MetaInfo.MetaObject;
 
 public abstract class IStreamGenerator

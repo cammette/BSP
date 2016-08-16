@@ -37,7 +37,7 @@ public abstract class BufWindow
     
     Bucket(WEntry[] vals, long id)
     {
-      super();
+      super(vals);
       this.id = id;
     }
     

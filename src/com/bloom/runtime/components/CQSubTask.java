@@ -518,7 +518,6 @@ public abstract class CQSubTask
   private static <T> List<T> makeList(Collection<T> col)
   {
     List<T> ret;
-    List<T> ret;
     if ((col instanceof List)) {
       ret = (List)col;
     } else {
@@ -529,12 +528,12 @@ public abstract class CQSubTask
   
   public static IGroupByPolicy makeGrouped()
   {
-    return new Grouped(null);
+    return new Grouped();
   }
   
   public static IGroupByPolicy makeNotGrouped()
   {
-    return new NotGrouped(null);
+    return new NotGrouped();
   }
   
   public static IOrderByPolicy makeOrdered(boolean sortasc)
@@ -589,7 +588,7 @@ public abstract class CQSubTask
       return (WAEvent)o;
     }
     
-    public Collection<WAEvent> sort(Collection<?> col)
+    public Collection<WAEvent> sort(Collection col)
     {
       return col;
     }
@@ -656,7 +655,7 @@ public abstract class CQSubTask
       return p == null ? null : p.event;
     }
     
-    public Collection<WAEvent> sort(Collection<?> col)
+    public Collection<WAEvent> sort(Collection col)
     {
       return sortList(col, this.sortasc ? comparator : reverse_comparator);
     }

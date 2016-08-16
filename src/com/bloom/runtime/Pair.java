@@ -40,7 +40,7 @@ public class Pair<A, B>
     return "(" + this.first + "," + this.second + ")";
   }
   
-  public static <A, B> Pair<A, B> make(A a, B b)
+  public static Pair make(Object a, Object b)
   {
     return new Pair(a, b);
   }

@@ -322,13 +322,13 @@ public class MetaInfo
       return Collections.emptyList();
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       graph.get(getUuid());
       return graph;
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       graph.get(getUuid());
       return graph;
@@ -1157,12 +1157,12 @@ public class MetaInfo
       return parent;
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       return super.inEdges(graph);
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       super.exportOrder(graph);
       MetaInfo.MetaObject obj = obtainMetaObject(this.dataType);
@@ -1285,13 +1285,13 @@ public class MetaInfo
       return json;
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       ((Set)graph.get(this.stream)).add(getUuid());
       return super.inEdges(graph);
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       super.exportOrder(graph);
       ((Set)graph.get(this.stream)).add(getUuid());
@@ -1477,7 +1477,7 @@ public class MetaInfo
       this.fieldList = fieldList;
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       if (this.stream != null)
       {
@@ -1492,7 +1492,7 @@ public class MetaInfo
       return super.inEdges(graph);
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       super.exportOrder(graph);
       MetaInfo.MetaObject obj = obtainMetaObject(this.stream);
@@ -1829,7 +1829,7 @@ public class MetaInfo
       return result;
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       super.inEdges(graph);
       ((Set)graph.get(getUuid())).add(this.outputStream);
@@ -1848,7 +1848,7 @@ public class MetaInfo
       this.outputClauses = ll;
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       super.exportOrder(graph);
       MetaInfo.MetaObject obj = obtainMetaObject(this.outputStream);
@@ -2190,13 +2190,13 @@ public class MetaInfo
       return parent;
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       ((Set)graph.get(this.inputStream)).add(getUuid());
       return super.inEdges(graph);
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       super.exportOrder(graph);
       MetaInfo.MetaObject obj = obtainMetaObject(this.inputStream);
@@ -2670,7 +2670,7 @@ public class MetaInfo
       return ret;
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       Map.Entry<EntityType, LinkedHashSet<UUID>> nodes;
 
@@ -2735,7 +2735,7 @@ public class MetaInfo
         throw new RuntimeException(metadataRepository == null ? "MetadataRepository" : "Authtokennot initialized, cannot export TQL without it");
       }
       Set<UUID> allOfTheObjects = getAllObjects();
-      Graph<UUID, Set<UUID>> applicationGraph = new Graph();
+      Graph applicationGraph = new Graph();
       for (UUID metaObjectUUID : allOfTheObjects)
       {
         MetaInfo.MetaObject metaObject = obtainMetaObject(metaObjectUUID);
@@ -2752,8 +2752,9 @@ public class MetaInfo
       if (MetaInfo.logger.isDebugEnabled())
       {
         StringBuffer graphOrdering = new StringBuffer();
-        for (Map.Entry<UUID, Set<UUID>> graphEntry : applicationGraph.entrySet())
+        for (Iterator iter = applicationGraph.entrySet().iterator(); iter.hasNext();)
         {
+        	  Map.Entry<UUID, Set<UUID>> graphEntry = (Map.Entry<UUID, Set<UUID>>)iter.next();
           MetaInfo.MetaObject mo = metadataRepository.getMetaObjectByUUID((UUID)graphEntry.getKey(), authToken);
           graphOrdering.append("FROM " + mo.getFullName() + " TO ");
           for (Iterator iterator =  ((Set)graphEntry.getValue()).iterator();iterator.hasNext();)
@@ -2788,7 +2789,7 @@ public class MetaInfo
     public List<Pair<MetaInfo.MetaObject, Flow>> showTopology()
       throws Exception
     {
-      Graph<UUID, Set<UUID>> graphF = new Graph();
+      Graph graphF = new Graph();
       inEdges(graphF);
       for (Map.Entry<EntityType, LinkedHashSet<UUID>> nodes : this.objects.entrySet()) {
         if (nodes.getKey() == EntityType.FLOW) {
@@ -3918,7 +3919,7 @@ public class MetaInfo
       return parent;
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       super.exportOrder(graph);
       ((Set)graph.get(this.typename)).add(getUuid());
@@ -4244,7 +4245,7 @@ public class MetaInfo
       return parent;
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       super.exportOrder(graph);
       ((Set)graph.get(this.contextType)).add(getUuid());
@@ -6331,7 +6332,7 @@ public class MetaInfo
       return parent;
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       if (this.inOutRules != null) {
         for (SorterRule rule : this.inOutRules)
@@ -6343,7 +6344,7 @@ public class MetaInfo
       return super.inEdges(graph);
     }
     
-    public Graph<UUID, Set<UUID>> exportOrder(@NotNull Graph<UUID, Set<UUID>> graph)
+    public Graph exportOrder(@NotNull Graph graph)
     {
       if (this.inOutRules != null) {
         for (SorterRule rule : this.inOutRules)
@@ -6399,7 +6400,7 @@ public class MetaInfo
       return parent;
     }
     
-    public Map<UUID, Set<UUID>> inEdges(Graph<UUID, Set<UUID>> graph)
+    public Map<UUID, Set<UUID>> inEdges(Graph graph)
     {
       ((Set)graph.get(this.wastoreID)).add(getUuid());
       return super.inEdges(graph);

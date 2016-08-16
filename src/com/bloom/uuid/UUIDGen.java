@@ -17,7 +17,6 @@
 import com.bloom.uuid.Hex;
 import com.bloom.uuid.MACAddressParser;
 import com.bloom.uuid.UUID;
-import com.bloom.uuid.UUIDGenThread;
  
  
  
@@ -154,13 +153,13 @@ import com.bloom.uuid.UUIDGenThread;
          clockSeqAndNode |= local[3] & 0xFF;
        }
        catch (UnknownHostException ex) {
-         clockSeqAndNode |= (Math.random() * 2.147483647E9D);
+         clockSeqAndNode |= (long)(Math.random() * 2.147483647E9D);
        }
      }
      
  
  
-     clockSeqAndNode |= (Math.random() * 16383.0D) << 48;
+     clockSeqAndNode |= (long)(Math.random() * 16383.0D) << 48;
    }
    
  

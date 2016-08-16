@@ -2,9 +2,10 @@ package com.bloom.runtime.meta;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
-public class Graph<UUID, Set>
-  extends HashMap<UUID, Set>
+public class Graph
+  extends HashMap
 {
   public Set get(Object key)
   {

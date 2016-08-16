@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import scala.Option;
 import scala.Tuple2;
-import scala.collection.immutable.HashMap;
+import scala.collection.immutable.HashMap$;
 import scala.collection.immutable.HashMap;
 
 class PartitionedSlidingCount1BufferPolicy
   implements WBufferPolicy
 {
   final KeyFactory keyFactory;
-  HashMap<RecordKey, WAEvent> buffer = HashMap.MODULE$.empty();
+  HashMap<RecordKey, WAEvent> buffer = HashMap$.MODULE$.empty();
   
   PartitionedSlidingCount1BufferPolicy(KeyFactory kf)
   {
@@ -43,7 +43,7 @@ class PartitionedSlidingCount1BufferPolicy
   
   public void initBuffer(ScalaWindow w)
   {
-    this.buffer = HashMap.MODULE$.empty();
+    this.buffer = HashMap$.MODULE$.empty();
   }
   
   public void onJumpingTimer()

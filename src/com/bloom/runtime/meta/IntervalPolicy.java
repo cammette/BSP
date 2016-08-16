@@ -252,7 +252,7 @@ public class IntervalPolicy
   }
   
   public static class IntervalPolicyDeserializer
-    extends StdDeserializer<IntervalPolicy>
+    extends StdDeserializer
   {
     public IntervalPolicyDeserializer()
     {

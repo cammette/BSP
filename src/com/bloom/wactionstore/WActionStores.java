@@ -75,7 +75,7 @@ public final class WActionStores
     return result;
   }
   
-  public static synchronized WActionStoreManager getInstance(String instanceProviderName, Map<String, Object> instanceProperties)
+  public static synchronized WActionStoreManager getInstance(String instanceProviderName, Map instanceProperties)
   {
     String providerClassName = getProviderClassName(instanceProviderName);
     WActionStoreManager instance;

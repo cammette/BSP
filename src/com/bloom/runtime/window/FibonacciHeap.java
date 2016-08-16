@@ -109,7 +109,7 @@ public class FibonacciHeap
     if (z.child != null)
     {
       z.child.parent = null;
-      for (Node x = Node.access$500(z).right; x != z.child; x = x.right) {
+      for (Node x = Node.access$500.right; x != z.child; x = x.right) {
         x.parent = null;
       }
       Node minleft = this.min.left;
@@ -252,9 +252,9 @@ public class FibonacciHeap
     }
   }
   
-  public <T> List<T> toList()
+  public List toList()
   {
-    List<T> list = new ArrayList();
+    List list = new ArrayList();
     if (this.min == null) {
       return list;
     }

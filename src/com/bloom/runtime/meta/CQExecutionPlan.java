@@ -168,9 +168,6 @@ public class CQExecutionPlan
     case 3: 
       return AggAlgo.AGG_AND_GROUP_BY;
     }
-    if (!$assertionsDisabled) {
-      throw new AssertionError();
-    }
     return AggAlgo.SIMPLE;
   }
   

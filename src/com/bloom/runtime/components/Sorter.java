@@ -128,7 +128,7 @@ public class Sorter
     for (Pair<String, String> stream : this.streamInfos)
     {
       WALoader wal = WALoader.get();
-      wal.removeBundle((String)stream.first, BundleDefinition.Type.keyFactory, (String)stream.second);
+      wal.removeBundle((String)stream.first, Type.keyFactory, (String)stream.second);
     }
   }
   

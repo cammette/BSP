@@ -48,10 +48,12 @@ public abstract class CQSubTaskJoin
     boolean isUpdateIndexesCodeGenerated = isUpdateIndexesCodeGenerated();
     if (isUpdateIndexesCodeGenerated)
     {
-      for (WAEvent e : getAdded()) {
+      for (Iterator iter =  getAdded().iterator(); iter.hasNext();) {
+    	  	WAEvent e = (WAEvent)iter.next();
         updateIndexes(e, true);
       }
-      for (WAEvent e : getRemoved()) {
+      for (Iterator iter =  getRemoved().iterator();iter.hasNext();) {
+    	  	WAEvent e = (WAEvent)iter.next();
         updateIndexes(e, false);
       }
     }
@@ -166,7 +168,7 @@ public abstract class CQSubTaskJoin
   
   public void createCollectionIterator(int ds, final Object o)
   {
-    this.iterators[ds = new Iterator()
+    this.iterators[ds] = new Iterator()
     {
       final Iterator<Object> it = ((Iterable)o).iterator();
       

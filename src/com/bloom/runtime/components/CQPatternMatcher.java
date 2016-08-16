@@ -90,7 +90,7 @@ public abstract class CQPatternMatcher
     MatcherPartition(RecordKey partKey)
     {
       this.partKey = partKey;
-      this.ctx = new CQPatternMatcher.MatcherContext(CQPatternMatcher.this, this, 0L, false);
+      this.ctx = new CQPatternMatcher.MatcherContext( this, 0L, false);
     }
     
     public synchronized void addEvent(int streamID, Object event)
@@ -331,22 +331,22 @@ public abstract class CQPatternMatcher
         if (ret.success())
         {
           close();
-          Object o = CQPatternMatcher.this.output(this, CQPatternMatcher.MatcherPartition.access$300(this.owner));
+          Object o = CQPatternMatcher.this.output(this, this.owner);
           CQPatternMatcher.this.doOutput(o);
           boolean reeval = true;
-          if ((this.lastAnchor == null) && (CQPatternMatcher.MatcherPartition.access$400(this.owner) != null))
+          if ((this.lastAnchor == null) && (this.owner != null))
           {
-            CQPatternMatcher.this.doCleanup(CQPatternMatcher.MatcherPartition.access$400(this.owner));
+            CQPatternMatcher.this.doCleanup(this.owner.partKey);
             reeval = false;
           }
           long fromPos = getRestartPosOnSuccess(ret.pos);
-          return new MatcherContext(CQPatternMatcher.this, this.owner, fromPos, reeval);
+          return new MatcherContext( this.owner, fromPos, reeval);
         }
         if (ret.samePos(this.curPos))
         {
           close();
           long fromPos = getRestartPosOnFail();
-          return new MatcherContext(CQPatternMatcher.this, this.owner, fromPos, true);
+          return new MatcherContext( this.owner, fromPos, true);
         }
         this.curPos += 1L;
       } while (getEventAt(this.curPos) != null);
@@ -367,7 +367,7 @@ public abstract class CQPatternMatcher
     
     public boolean createTimer(int id, long interval)
     {
-      CQPatternMatcher.TimerEvent te = new CQPatternMatcher.TimerEvent(CQPatternMatcher.this, this, id);
+      CQPatternMatcher.TimerEvent te = new CQPatternMatcher.TimerEvent( this, id);
       te.task = CQPatternMatcher.this.getScheduler().schedule(te, interval, TimeUnit.MICROSECONDS);
       
       CQPatternMatcher.TimerEvent pte = (CQPatternMatcher.TimerEvent)this.timers.put(Integer.valueOf(id), te);
@@ -423,12 +423,12 @@ public abstract class CQPatternMatcher
     
     private CQPatternMatcher.PEvent getEventAt(long pos)
     {
-      return (CQPatternMatcher.PEvent)CQPatternMatcher.MatcherPartition.access$500(this.owner).get(Long.valueOf(pos));
+      return (CQPatternMatcher.PEvent)this.owner.get(Long.valueOf(pos));
     }
     
     public Object getEventAt(Long pos, int offset)
     {
-      CQPatternMatcher.PEvent pe = (CQPatternMatcher.PEvent)CQPatternMatcher.MatcherPartition.access$500(this.owner).get(Long.valueOf(pos.longValue() - offset));
+      CQPatternMatcher.PEvent pe = (CQPatternMatcher.PEvent)this.owner.get(Long.valueOf(pos.longValue() - offset));
       if (pe == null) {
         return null;
       }
@@ -534,7 +534,7 @@ public abstract class CQPatternMatcher
   {
     public AnchorNode(CQPatternMatcher.MatcherContext ctx, int nodeid, String src)
     {
-      super(nodeid, src);
+      super(ctx, nodeid, src);
     }
     
     public CQPatternMatcher.Ack eval(CQPatternMatcher.MatcherContext ctx, long pos, boolean greedy)
@@ -558,7 +558,7 @@ public abstract class CQPatternMatcher
     
     public Condition(CQPatternMatcher.MatcherContext ctx, int nodeid, String src, int exprid)
     {
-      super(nodeid, src);
+      super(ctx, nodeid, src);
       this.exprid = exprid;
     }
     
@@ -586,7 +586,7 @@ public abstract class CQPatternMatcher
     
     public Variable(CQPatternMatcher.MatcherContext ctx, int nodeid, String src, int exprid)
     {
-      super(nodeid, src);
+      super(ctx, nodeid, src);
       this.exprid = exprid;
     }
     
@@ -621,7 +621,7 @@ public abstract class CQPatternMatcher
     
     public Repetition(CQPatternMatcher.MatcherContext ctx, int nodeid, String src, int subnodeid, int min, int max)
     {
-      super(nodeid, src);
+      super(ctx,nodeid, src);
       this.subnodeid = subnodeid;
       this.min = min;
       this.max = max;
@@ -690,7 +690,7 @@ public abstract class CQPatternMatcher
     
     public Sequence(CQPatternMatcher.MatcherContext ctx, int nodeid, String src, int[] seq)
     {
-      super(nodeid, src);
+      super(ctx, nodeid, src);
       this.cur = 0;
       for (int id : seq) {
         this.seq.add(ctx.makeNode(id));
@@ -782,7 +782,7 @@ public abstract class CQPatternMatcher
     
     public Alternation(CQPatternMatcher.MatcherContext ctx, int nodeid, String src, int[] alternatives)
     {
-      super(nodeid, src);
+      super(ctx, nodeid, src);
       for (int id : alternatives) {
         this.alternatives.add(ctx.makeNode(id));
       }

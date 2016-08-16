@@ -13,6 +13,7 @@ import com.bloom.runtime.meta.MetaInfo.Type;
 import com.bloom.runtime.meta.MetaInfo.Window;
 import com.bloom.runtime.utils.NamePolicy;
 import com.bloom.runtime.containers.WAEvent;
+import com.bloom.classloading.BundleDefinition;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -93,9 +94,9 @@ public abstract class AttrExtractor
     try
     {
       Pair<AttrExtractor, String> extAndField = genAttrExtractor(wi, fieldName, srv);
-      AttrExtractor ae = (AttrExtractor)extAndField.first;
+      final AttrExtractor ae = (AttrExtractor)extAndField.first;
       final String keyFieldName = (String)extAndField.second;
-      new CmpAttrs()
+      return new CmpAttrs()
       {
         public boolean inRange(WAEvent first, WAEvent last)
         {

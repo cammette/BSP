@@ -4,16 +4,16 @@ import com.bloom.runtime.containers.Range;
 import com.bloom.runtime.containers.WAEvent;
 import java.util.List;
 import java.util.NoSuchElementException;
-import scala.collection.JavaConverters.;
+import scala.collection.JavaConverters$;
 import scala.collection.convert.Decorators.AsJava;
 import scala.collection.immutable.Queue;
-import scala.collection.immutable.Queue.;
+import scala.collection.immutable.Queue$;
 
 abstract class WBufferJumping1
   extends WBuffer
 {
-  private Queue<WAEvent> buffer = Queue..MODULE$.empty();
-  private Queue<WAEvent> oldbuf = Queue..MODULE$.empty();
+  private Queue<WAEvent> buffer = Queue$.MODULE$.empty();
+  private Queue<WAEvent> oldbuf = Queue$.MODULE$.empty();
   
   final void addEvent(WAEvent e)
   {
@@ -39,10 +39,10 @@ abstract class WBufferJumping1
   void doJump()
     throws Exception
   {
-    List<WAEvent> newrec = (List)JavaConverters..MODULE$.seqAsJavaListConverter(this.buffer).asJava();
-    List<WAEvent> oldrec = (List)JavaConverters..MODULE$.seqAsJavaListConverter(this.oldbuf).asJava();
+    List<WAEvent> newrec = (List)JavaConverters$.MODULE$.seqAsJavaListConverter(this.buffer).asJava();
+    List<WAEvent> oldrec = (List)JavaConverters$.MODULE$.seqAsJavaListConverter(this.oldbuf).asJava();
     this.oldbuf = this.buffer;
-    this.buffer = Queue..MODULE$.empty();
+    this.buffer = Queue$.MODULE$.empty();
     publish(newrec, oldrec);
   }
 }

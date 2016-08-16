@@ -72,9 +72,9 @@ class SkipListSnapshotRefIndex
     private final int id;
     private final long head;
     
-    CmpSnapshotRef(long head, BufWindow buffer, Snapshot referent, ReferenceQueue<? super Snapshot> q)
+    CmpSnapshotRef(long head, BufWindow buffer, Snapshot referent, ReferenceQueue q)
     {
-      super(referent, q);
+      super(buffer,referent, q);
       this.head = head;
       this.id = (next_id++);
     }

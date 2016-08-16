@@ -6,26 +6,17 @@ public class AuthToken
    extends UUID
  {
    private static final long serialVersionUID = 4392763777100817312L;
-   
- 
- 
- 
- 
  
    public AuthToken()
    {
      this(System.currentTimeMillis());
    }
    
- 
- 
    public AuthToken(long currentTimeMillis)
    {
      super(currentTimeMillis);
    }
    
- 
- 
  
    public AuthToken(long time, long clockSeqAndNode)
    {

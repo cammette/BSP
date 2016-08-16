@@ -179,9 +179,9 @@ public class ScalaWindow
     this.bufferPolicy.onJumpingTimer();
   }
   
-  public static ServerWrapper makeServerWrapper(Server srv)
+  public static ServerWrapper makeServerWrapper(final Server srv)
   {
-    new ServerWrapper()
+    return new ServerWrapper()
     {
       public Channel createChannel(FlowComponent owner)
       {
@@ -218,9 +218,9 @@ public class ScalaWindow
     };
   }
   
-  public static ServerWrapper makeTestServerWrapper(Subscriber sub, final ScheduledExecutorService executor)
+  public static ServerWrapper makeTestServerWrapper(final Subscriber sub, final ScheduledExecutorService executor)
   {
-    Channel output = new Channel()
+    final Channel output = new Channel()
     {
       public void close()
         throws IOException
@@ -248,7 +248,7 @@ public class ScalaWindow
         return 0;
       }
     };
-    new ServerWrapper()
+    return new ServerWrapper()
     {
       public Channel createChannel(FlowComponent owner)
       {

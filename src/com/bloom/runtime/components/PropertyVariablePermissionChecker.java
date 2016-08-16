@@ -3,13 +3,12 @@ package com.bloom.runtime.components;
 import com.bloom.metaRepository.MetaDataRepositoryException;
 import com.bloom.metaRepository.MetadataRepository;
 import com.bloom.metaRepository.PermissionUtility;
-import com.bloom.runtime.meta.MetaInfo.PropertyVariable;
+import com.bloom.runtime.meta.MetaInfo;
 import com.bloom.security.WASecurityManager;
-import com.bloom.security.ObjectPermission.Action;
+import com.bloom.security.ObjectPermission;
 import com.bloom.uuid.AuthToken;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 public abstract class PropertyVariablePermissionChecker

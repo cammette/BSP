@@ -69,12 +69,12 @@ public abstract class TaskEvent
     return "TE(" + batch() + " " + removedBatch() + " " + snapshot() + ")";
   }
   
-  public static TaskEvent createWindowEvent(IBatch added, final IBatch removed, final IRange range)
+  public static TaskEvent createWindowEvent(final IBatch added, final IBatch removed, final IRange range)
   {
-    new TaskEvent()
+    return new TaskEvent()
     {
       private static final long serialVersionUID = 5776239061208773283L;
-      IBatch xadded = this.val$added;
+      IBatch xadded = added;
       IBatch xremoved = removed;
       IRange xrange = range;
       
@@ -109,12 +109,12 @@ public abstract class TaskEvent
     };
   }
   
-  public static TaskEvent createStreamEvent(List<WAEvent> added)
+  public static TaskEvent createStreamEvent(final List<WAEvent> added)
   {
-    new TaskEvent()
+    return new TaskEvent()
     {
       private static final long serialVersionUID = 5260812394346021244L;
-      List<WAEvent> xadded = this.val$added;
+      List<WAEvent> xadded = added;
       
       public Batch batch()
       {
@@ -123,9 +123,9 @@ public abstract class TaskEvent
       
       public void write(Kryo kr, Output output)
       {
-        if ((this.val$added != null) && (this.xadded.size() > 0))
+        if ((added != null) && (this.xadded.size() > 0))
         {
-          if (this.val$added.size() == 1)
+          if (added.size() == 1)
           {
             output.writeByte(1);
             kr.writeObject(output, this.xadded.get(0));
@@ -133,7 +133,7 @@ public abstract class TaskEvent
           else
           {
             output.writeByte(2);
-            kr.writeClassAndObject(output, this.val$added);
+            kr.writeClassAndObject(output, added);
           }
         }
         else {
@@ -195,12 +195,12 @@ public abstract class TaskEvent
     return ret;
   }
   
-  public static TaskEvent createStreamEvent(List<WAEvent> added, final List<WAEvent> removed, final boolean isStateful)
+  public static TaskEvent createStreamEvent(final List<WAEvent> added, final List<WAEvent> removed, final boolean isStateful)
   {
-    new TaskEvent()
+    return new TaskEvent()
     {
       private static final long serialVersionUID = 8121755941701609319L;
-      List<WAEvent> xadded = this.val$added;
+      List<WAEvent> xadded = added;
       List<WAEvent> xremoved = removed;
       boolean stateful = isStateful;
       
@@ -217,7 +217,7 @@ public abstract class TaskEvent
       public IRange snapshot()
       {
         if (this.stateful) {
-          return Range.createRange(null, this.val$added);
+          return Range.createRange(null, added);
         }
         return Range.emptyRange();
       }
@@ -256,12 +256,12 @@ public abstract class TaskEvent
     };
   }
   
-  public static TaskEvent createWindowStateEvent(Range snapshot)
+  public static TaskEvent createWindowStateEvent(final Range snapshot)
   {
-    new TaskEvent()
+    return new TaskEvent()
     {
       private static final long serialVersionUID = 3621467538164019186L;
-      Range xsnapshot = this.val$snapshot;
+      Range xsnapshot = snapshot;
       
       public IBatch batch()
       {
@@ -290,12 +290,12 @@ public abstract class TaskEvent
     };
   }
   
-  public static TaskEvent createWAStoreQueryEvent(Range snapshot)
+  public static TaskEvent createWAStoreQueryEvent(final Range snapshot)
   {
-    new TaskEvent()
+    return new TaskEvent()
     {
       private static final long serialVersionUID = 4601388050386280658L;
-      Range xsnapshot = this.val$snapshot;
+      Range xsnapshot = snapshot;
       
       public IBatch batch()
       {
@@ -331,7 +331,7 @@ public abstract class TaskEvent
   
   public static TaskEvent createStreamEventWithNewWAEvents(final ITaskEvent event)
   {
-    List<WAEvent> added = new ArrayList();
+    final List<WAEvent> added = new ArrayList();
     for (WAEvent original : event.batch()) {
       try
       {
@@ -365,9 +365,9 @@ public abstract class TaskEvent
         logger.error(e);
       }
     }
-    new TaskEvent()
+    return new TaskEvent()
     {
-      List<WAEvent> _added = this.val$added;
+      List<WAEvent> _added = added;
       List<WAEvent> _removed = removed;
       TaskEvent _event = (TaskEvent)event;
       private static final long serialVersionUID = -1246997384610275229L;

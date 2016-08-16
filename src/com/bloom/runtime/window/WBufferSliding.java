@@ -6,12 +6,12 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 import scala.Tuple2;
 import scala.collection.immutable.Queue;
-import scala.collection.immutable.Queue.;
+import scala.collection.immutable.Queue$;
 
 abstract class WBufferSliding
   extends WBuffer
 {
-  private Queue<WAEvent> buffer = Queue..MODULE$.empty();
+  private Queue<WAEvent> buffer = Queue$.MODULE$.empty();
   
   final void addEvent(WAEvent e)
   {
