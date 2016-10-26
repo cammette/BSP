@@ -108,7 +108,7 @@
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >the name of the database containing the tables (may be omitted if specified in <tt class=" ">Tables</tt> or <tt class=" ">ConnectionURL</tt>)    </p>
+        <p  >包含表的数据库名称 (may be omitted 如果在 <tt class=" ">Tables</tt> 或 <tt class=" ">ConnectionURL</tt> 中指定，则可以忽略)    </p>
             </td>
         </tr>
     <tr>
@@ -122,7 +122,7 @@
         <p  >True    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >With the default value of True, begin and commit transactions are filtered out. Set to False to include begin and commit transactions.    </p>
+        <p  >默认值为 True, 开始(begin) 和 提交(commit) 事务被过滤掉. 设置为False 将包含开始(begin) 和 提交(commit).    </p>
             </td>
         </tr>
     <tr>
@@ -136,7 +136,7 @@
         <p  >&nbsp;    </p>
             </td>
                 <td  class="confluenceTd" rowspan="1" colspan="1">
-        <p  >Change data for any tables specified here will not be returned. For example, if <tt class=" ">Tables</tt> uses a wildcard, data from any tables specified here will be omitted. Multiple table names and wildcards may be used as for <tt class=" ">Tables</tt>.    </p>
+        <p  >指定表的增量更新数据被排除. 例如, 如果 <tt class=" ">Tables</tt> 使用了一个掩码, 来自指定表的数据将被忽略. 可以使用多个表名和掩码来指定 <tt class=" ">Tables</tt> 表.    </p>
             </td>
         </tr>
 </tbody>        </table>
