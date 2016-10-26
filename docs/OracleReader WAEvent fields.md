@@ -7,12 +7,12 @@
 	<ol>
 		<li>OperationName: COMMIT, BEGIN, INSERT, DELETE, UPDATE, 或 (当仅使用 LogMiner) ROLLBACK.</li>
 		<li>TxnID: transaction ID.</li>
-		<li>TableName (returned only for INSERT, DELETE, and UPDATE operations): 表的全名</li>
-		<li>ROWID (returned only for INSERT, DELETE, and UPDATE operations): 对于inserted, deleted, or updated 行的 Oracle ID.</li>
+		<li>TableName (仅为 INSERT, DELETE, 和 UPDATE 操作返回): 表的全名</li>
+		<li>ROWID (仅为 INSERT, DELETE, 和 UPDATE 操作): 对于inserted, deleted, 或 updated 行的 Oracle ID.</li>
 		
 	</ol>
 	<br />
-	为了查询这些域的值, 使用 META 函数.查看 Parsing the fields of WAEvent for CDC readers.
+	为了查询这些域的值, 使用 META 函数.查看 为CDC readers解析WAEvent的数据域.
 
 </p>
 
@@ -21,14 +21,14 @@ data: 一个域的数组, 从0计数, 包括:
 
 	<br />
 	<ol>
-		<li>for an INSERT or DELETE operation, the values that were inserted or deleted</li>
-		<li>for an UPDATE, the values after the operation was completed</li>
-		<li><a>GoldenGateTrailParser sample application and output</a></li>
+		<li>对于一个 INSERT 或 DELETE 操作, 这个值是插入或者删除</li>
+		<li>对于一个 UPDATE, 在操作完成之后的值</li>
+		<li><a>GoldenGateTrailParser 示例应用和输出 </a></li>
 	
 	</ol>
 	<br />
 
-	为了查询这些域的值, 使用 SELECT ... (DATA[]).查看  Parsing the fields of WAEvent for CDC readers.
+	为了查询这些域的值, 使用 SELECT ... (DATA[]).查看 为CDC readers解析WAEvent的数据域.
 
 </p>
 
